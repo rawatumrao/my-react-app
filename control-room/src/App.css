@@ -1,0 +1,26 @@
+body {
+  background-color: black;
+  padding: 0px 0px;
+  margin: 5 5px;
+}
+
+.btn {
+  position: relative;
+  top: auto;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  -ms-transform: translate(-50%, -50%);
+  background-color: rgb(26, 24, 37);
+  color: white;
+  font-size: 16px;
+  padding: 10px 40px;
+  border: none;
+  cursor: pointer;
+  border-radius: 5px;
+  text-align: center;
+}
+
+.btn:hover {
+  background-color: White;
+  color: black;
+}

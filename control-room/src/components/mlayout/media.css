@@ -1,0 +1,98 @@
+/* Container for the expand/collapse conponent */
+.expand-collapse-container {
+    padding: 1px;
+    background-color: black;
+    border-radius: 2px;
+    gap: 5px;
+    margin: 0 5px;
+  }
+
+/* Header styling */
+.header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 5px;
+    margin: 5px 5px;
+}
+
+.header-image {
+    width: 50px;
+    height: 50px;
+    border-radius: 2px;
+    padding: auto;
+    margin: 0 5px;
+}
+
+.expand-button,
+.collapse-button {
+    background-color: black;
+    color: white;
+    border: none;
+    padding: 10px 10px;
+    cursor: pointer;
+    border-radius: 5px;
+    font-size: 16px;
+}
+
+.see-all {
+    font-size: 16px;
+    color: white;
+    cursor: pointer;
+}
+
+/* Image gallery styling */
+.image-gallery {
+    display: flex;
+    align-items: center;
+    margin-top: auto;
+}
+
+.nav-button {
+    background-color: black;
+    color: white;
+    border: none;
+    padding: 10px;
+    cursor: pointer;
+    border-radius: 10px;
+    font-size: 30px;
+}
+
+.images {
+    display: flex;
+    overflow: hidden;
+}
+
+.images img {
+    width: 150px;
+    height: 150px;
+    margin: 0 10px;
+    border-radius: 8px;
+}
+
+.zoom-image {
+    transition: transform 0, 3s ease;
+}
+
+.zoom-image:hover {
+    transform: scale(1.1);
+}
+
+.switch-label {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+}
+
+.toggle-container {
+    display: flex;
+    align-items: center;
+}
+
+.toggle-label {
+    margin: 0 5px;
+    color: #e0e0e0;
+    font-family: Arial, sans-serif;
+    font-size: 14px;
+}

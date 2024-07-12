@@ -1,0 +1,59 @@
+.container {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    padding: 15px;
+    background-color: black;
+    color: #ffffff;
+    height: auto;
+    box-sizing: border-box;
+
+}
+
+.container h4 {
+    margin: 0;
+    padding: 0;
+    cursor: pointer;
+    text-align: left;
+}
+
+.list-container {
+    width: 100%;
+
+}
+
+.list-container h2 {
+    cursor: pointer;
+    margin: auto;
+    padding: 10px;
+    border-radius: 4px;
+}
+
+.list {
+    background-color: #160b0b;
+    border-radius: 8px;
+    padding: 10px;
+}
+
+.item {
+    background-color: black;
+    padding: 10px;
+    margin-bottom: 10px;
+    border-radius: 4px;
+    color: #ffffff;
+    cursor: grab;
+    text-align: left;
+}
+
+.item:active {
+    cursor: grabbing;
+}
+
+.icon {
+    margin-left: 10px;
+    float: right;
+}
+
+.host {
+    color: #9090ff;
+}
