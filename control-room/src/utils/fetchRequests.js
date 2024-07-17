@@ -1,4 +1,4 @@
-import { EVENT_ID, NODE_ADDRESS } from "../contexts/constants";
+import { EVENT_ID, NODE_ADDRESS, INITIAL_TOKEN } from "../config/constants";
 
 export const participantsPostFetch = async (data) => {
   await fetch(
@@ -57,15 +57,65 @@ export const conferenceGetFetch = async (data) => {
       console.log(err);
     });
 };
+/* ============================     Control-Room-Api      =============================== */
 
+  
 
-// ==================================================
- // `https://${NODE_ADDRESS}/api/client/v2/conferences/${EVENT_ID}/participants/${data.uuid}/${data.call}`,
+const getLatestToken = () => {
+  return new Promise((resolve)=> {
+    const bc = new BroadcastChannel("pexip");
+    bc.onmessage = (msg) => {
+      console.log(msg.data);
 
-export const transformLayoutPostWithBody = async (data) => {
+      if(msg.data.event === 'token_refresh') {
+        resolve(msg.data.info);
+      }
+    };
+  });
+};
+
+export const transformLayout = async (layout) => {
+  const token = await getLatestToken();
+  const data = {"transforms":{"layout":layout}};
+  console.log("Selected Layout and new token: ", data, token );
+  const response = await fetch(`https://${NODE_ADDRESS}/api/client/v2/conferences/${EVENT_ID}/transform_layout`, {
+    method: "POST",
+    headers: {
+      token: token,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(data.body),
+  });
+  return response;
+};
+
+export const fetchParticipants = async () => {
+  const response = await fetch(`https://${NODE_ADDRESS}/api/client/v2/conferences/${EVENT_ID}/participants`, {
+    headers: {
+      token: `${INITIAL_TOKEN}`,
+    },
+  });
+  const data = await response.json();
+  return data.result;
+};
+
+export const participantSpotlightOn = async (data) => {
   await fetch(
-    
-    `https://${NODE_ADDRESS}/api/client/v2/conferences/${EVENT_ID}/transform_layout`,
+    `https://${NODE_ADDRESS}/api/client/v2/conferences/${EVENT_ID}/participants/${data.uuid}/spotlighton`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        token: `${data.token}`,
+      },
+      body: JSON.stringify(data.body),
+    }
+  );
+};
+
+export const participantSpotlightOff = async (data) => {
+  await fetch(
+    `https://${NODE_ADDRESS}/api/client/v2/conferences/${EVENT_ID}/participants/${data.uuid}/spotlightoff`,
     {
       method: "POST",
       headers: {

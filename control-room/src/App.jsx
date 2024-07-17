@@ -1,23 +1,22 @@
 
 import "./App.css";
-import ComponentWrapper from "./components/ComponentWrapper.jsx";
-import ViewAllLayout from "./components/viewalllayout/viewalllayout.jsx";
+import ComponentWrapper from "./components/common/ComponentWrapper.jsx";
+import ViewAllLayout from "./components/layout/viewalllayout/viewalllayout.jsx";
 import { HashRouter as Router, Route, Routes } from "react-router-dom";
 
 import { useState, useRef, useEffect } from "react";
 import {
   EVENTS,
   INITIAL_TOKEN,
-  EVENT_ID,
-  NODE_ADDRESS,
   INITIAL_PARTICIPANT,
   ENV,
   ENVIRONMENT,
   VB_URI_NAME,
   ROLES,
-} from "././contexts/constants";
+} from "./config/constants.js";
 import { AppContext } from "././contexts/context";
 import { createData } from "././utils/processJsonData";
+import { fetchParticipants, transformLayout } from "./utils/fetchRequests.js";
 
 const findRoleOfUser = (users) => {
   let amIaHost = false;
@@ -30,62 +29,68 @@ const findRoleOfUser = (users) => {
 function App() {
   const [preseterLayout, setPresenterLayout] = useState(null);
   const [mediaLayout, setMediaLayout] = useState(null);
+  let [participantsArray, setParticipantsArray] = useState(createData(INITIAL_PARTICIPANT));
+  const Data = useRef({ token: INITIAL_TOKEN });
 
   // Setting up presenter and media layout by clicking on apply button
-  const handleApplyClick = () => {
-    const postData = {"transforms": {"layout": preseterLayout}};
-      
-    console.log("Testing Data which is going to set", postData);
-    fetch(`https://${NODE_ADDRESS}/api/client/v2/conferences/${EVENT_ID}/transform_layout`,
-      {
-        method: 'POST',
-        headers: {
-          token: `${INITIAL_TOKEN}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(postData)
-      }).then(response => {
-        console.log("response", response)
-        if(response.ok){
-          console.log("Layout setup successfully", response)
-        } else {
-          console.log("There is some network issue to setup layout", response)
-        }
-      }).catch(e =>{
-        console.log("Error during setup layout", e)
-      })
+
+  const handleApplyClick = async () => {
+    try {
+      const response = await transformLayout(preseterLayout);
+      if(response.ok){
+        console.log("Layout setup successfully", response)
+      } else {
+        console.log("There is some network issue to setup layout", response)
+      }
+    } catch(e){
+      console.log("Error during setup layout", e)
+    }
+    
+    /*
+// SpotlightOn
+    try {
+      const response = await transformLayout(preseterLayout, token);
+      if(response.ok){
+        console.log("Layout setup successfully", response)
+      } else {
+        console.log("There is some network issue to setup layout", response)
+      }
+    } catch(e){
+      console.log("Error during setup layout", e)
+    }
+//SpotlightOff
+    try {
+      const response = await transformLayout(preseterLayout, token);
+      if(response.ok){
+        console.log("Layout setup successfully", response)
+      } else {
+        console.log("There is some network issue to setup layout", response)
+      }
+    } catch(e){
+      console.log("Error during setup layout", e)
+    }
+*/
+
+
+
   };
 
-  let [participantsArray, setParticipantsArray] = useState(
-    createData(INITIAL_PARTICIPANT)
-  );
-  const Data = useRef({ token: INITIAL_TOKEN });
+  
 
   useEffect(() => {
     if (ENV === ENVIRONMENT.prod) {
-      // get initial participants on open
-      fetch(
-        `https://${NODE_ADDRESS}/api/client/v2/conferences/${EVENT_ID}/participants`,
-        {
-          headers: {
-            token: `${INITIAL_TOKEN}`,
-          },
-        }
-      )
-        .then((response) => response.json())
-        .then((data) => {
-          let updatedData = createData(data.result);
-          Data.current.meRole = findRoleOfUser(updatedData);
-          return setParticipantsArray(updatedData);
-        })
-        .catch((error) => console.error(error));
+      fetchParticipants().then((data) => {
+        let updatedData = createData(data.result);
+        Data.current.meRole = findRoleOfUser(updatedData);
+        setParticipantsArray(updatedData);
+      })
+      .catch((error) => console.error(error));
     }
 
     // get server sent events on pexip broadcast channel
     const bc = new BroadcastChannel("pexip");
     bc.onmessage = (msg) => {
       console.log(msg.data);
-
       console.log(
         `%c ****************************`,
         `color: red; font-weight: bold;`
@@ -104,8 +109,6 @@ function App() {
       }
     };
   }, []);
-
-  //==================================================
 
   return (
     <>

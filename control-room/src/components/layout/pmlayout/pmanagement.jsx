@@ -8,7 +8,7 @@ import {
 import Switch from "react-switch";
 
 const PManagement = ({participantsArray}) => {
-  const [checked, setChecked] = useState(false);
+  const [checked, setChecked] = useState(true);
 
   const [expanded, setExpanded] = useState(false);
 
@@ -23,7 +23,6 @@ const PManagement = ({participantsArray}) => {
   return (
     <div className="expand-collapse-container">
       <div className="header">
-        
           <span className="expand-button" onClick={toggleExpandCollapse}>
             {!expanded ? (
               <MdOutlineKeyboardArrowRight />
@@ -32,7 +31,6 @@ const PManagement = ({participantsArray}) => {
             )}
             Presenter Management
           </span>
-        
       </div>
       {expanded && (
         <div>
@@ -48,7 +46,6 @@ const PManagement = ({participantsArray}) => {
                   onColor="#00BFFF"
                   onHandleColor="#00BFFF"
                   handleDiameter={20}
-                  uncheckedHandleIcon={false}
                   checkedIcon={false}
                   height={20}
                   width={48}

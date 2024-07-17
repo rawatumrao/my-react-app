@@ -1,7 +1,7 @@
 import React from 'react'
-import Presenter from './playout/presenter.jsx'
-import PManagement from './pmlayout/pmanagement.jsx'
-import Media from './mlayout/media.jsx'
+import Presenter from '../layout/playout/presenter.jsx'
+import PManagement from '../layout/pmlayout/pmanagement.jsx'
+import Media from '../layout/mlayout/media.jsx'
 
  const ComponentWrapper = ({participantsArray, pLayout, mLayout}) => {
   return (

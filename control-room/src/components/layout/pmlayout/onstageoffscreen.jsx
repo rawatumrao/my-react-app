@@ -16,9 +16,9 @@ const OnStageOffScreen = ({ participantsArray }) => {
   useEffect(() => {
     const loadItems = () => {
       const onStage = data
-        .filter((item) => item.spotlightOrder !== 0)
+        .filter((item) => item.spotlightOrder !== 0 && item.protocol !== "api" && item.protocol !== "rtmp")
         .sort((a, b) => a.spotlightOrder - b.spotlightOrder);
-      const offScreen = data.filter((item) => item.spotlightOrder === 0);
+      const offScreen = data.filter((item) => item.spotlightOrder === 0 && item.protocol !== "api" && item.protocol !== "rtmp");
       setOnStageItems(onStage);
       setOffScreenItems(offScreen);
     };
@@ -43,10 +43,10 @@ const OnStageOffScreen = ({ participantsArray }) => {
     destList.splice(destination.index, 0, movedItem);
 
     if (destination.droppableId === "onStage") {
-      setOnStageItems(destList.sort((a, b) => a.spotlightOrder - b.spotlightOrder));
+      setOnStageItems(destList.filter(item => item.protocol !== "api" && item.protocol !== "rtmp").sort((a, b) => a.spotlightOrder - b.spotlightOrder));
       setOffScreenItems([...offScreenItems]);
     } else {
-      setOffScreenItems(destList);
+      setOffScreenItems(destList.filter(item=> item.protocol !== "api" && item.protocol !== "rtmp"));
       setOnStageItems([...onStageItems]);
     }
 
@@ -57,8 +57,8 @@ const OnStageOffScreen = ({ participantsArray }) => {
     setData(updatedData);
   };
 
-  const [onStageOpen, setOnStageOpen] = useState(true);
-  const [offScreenOpen, setOffScreenOpen] = useState(true);
+  const [onStageOpen, setOnStageOpen] = useState(false);
+  const [offScreenOpen, setOffScreenOpen] = useState(false);
 
   const [isMicMuted, setIsMicMuted] = useState(true);
   const [isCameraOff, setIsCameraOff] = useState(true);
