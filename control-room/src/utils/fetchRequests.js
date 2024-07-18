@@ -59,30 +59,13 @@ export const conferenceGetFetch = async (data) => {
 };
 /* ============================     Control-Room-Api      =============================== */
 
-  
-
-const getLatestToken = () => {
-  return new Promise((resolve)=> {
-    const bc = new BroadcastChannel("pexip");
-    bc.onmessage = (msg) => {
-      console.log(msg.data);
-
-      if(msg.data.event === 'token_refresh') {
-        resolve(msg.data.info);
-      }
-    };
-  });
-};
-
-export const transformLayout = async (layout) => {
-  const token = await getLatestToken();
-  const data = {"transforms":{"layout":layout}};
-  console.log("Selected Layout and new token: ", data, token );
+export const transformLayout = async (data) => {
+  console.log("Selected Layout and new token: ", data, INITIAL_TOKEN );
   const response = await fetch(`https://${NODE_ADDRESS}/api/client/v2/conferences/${EVENT_ID}/transform_layout`, {
     method: "POST",
     headers: {
-      token: token,
       "Content-Type": "application/json",
+      token: `${INITIAL_TOKEN}`,
     },
     body: JSON.stringify(data.body),
   });
@@ -100,13 +83,14 @@ export const fetchParticipants = async () => {
 };
 
 export const participantSpotlightOn = async (data) => {
+  console.log("called participantSpotlightOn api ", data, INITIAL_TOKEN);
   await fetch(
     `https://${NODE_ADDRESS}/api/client/v2/conferences/${EVENT_ID}/participants/${data.uuid}/spotlighton`,
     {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        token: `${data.token}`,
+        token: `${INITIAL_TOKEN}`,
       },
       body: JSON.stringify(data.body),
     }
@@ -114,13 +98,14 @@ export const participantSpotlightOn = async (data) => {
 };
 
 export const participantSpotlightOff = async (data) => {
+  console.log("called participantSpotlightOff api ", data, INITIAL_TOKEN);
   await fetch(
     `https://${NODE_ADDRESS}/api/client/v2/conferences/${EVENT_ID}/participants/${data.uuid}/spotlightoff`,
     {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        token: `${data.token}`,
+        token: `${INITIAL_TOKEN}`,
       },
       body: JSON.stringify(data.body),
     }

@@ -6,6 +6,8 @@ import {
   MdOutlineKeyboardArrowRight,
 } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
+import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
+import {faChevronLeft, faChevronRight} from '@fortawesome/free-solid-svg-icons';
 
 
 const Presenter = ({ pLayout }) => {
@@ -66,10 +68,8 @@ const Presenter = ({ pLayout }) => {
       </div>
       {expanded && (
         <div className="image-gallery">
-          <button className="nav-button" onClick={handlePrev}>
-            &lt;
-          </button>
-          <div className="images">
+          <FontAwesomeIcon icon={faChevronLeft} className="nav-arrow left-arrow" onClick={handlePrev} />
+           <div className="images">
             {images
               .slice(currentImageIndex, currentImageIndex + 7)
               .map((image, index) => (
@@ -82,11 +82,9 @@ const Presenter = ({ pLayout }) => {
                   style={{ border: selectedImage?.imageUrl === image.imageUrl ? '2px solid blue' : 'none'}}
                 />
               ))}
+           </div>
+           <FontAwesomeIcon icon={faChevronRight} className="nav-arrow right-arrow" onClick={handleNext} />
           </div>
-          <button className="nav-button" onClick={handleNext}>
-            &gt;
-          </button>
-        </div>
       )}
     </div>
   );

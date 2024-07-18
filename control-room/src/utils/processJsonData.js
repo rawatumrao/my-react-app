@@ -23,6 +23,10 @@ export const createData = (DATA) => {
     if (item?.isPresenting === undefined)
       item.isPresenting = item?.is_presenting === "YES" ? true : false;
 
+    if (item?.serviceType === undefined) item.serviceType = item?.service_type;
+
+    if (item?.overlayText === undefined) item.overlayText = item?.overlay_text;
+
     processedData?.push(item);
   });
 

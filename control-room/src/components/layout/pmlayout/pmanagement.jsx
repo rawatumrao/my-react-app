@@ -7,10 +7,10 @@ import {
 } from "react-icons/md";
 import Switch from "react-switch";
 
-const PManagement = ({participantsArray}) => {
-  const [checked, setChecked] = useState(true);
+const PManagement = ({participantsArray, setParticipantsArray}) => {
+  const [checked, setChecked] = useState(false);
 
-  const [expanded, setExpanded] = useState(false);
+  const [expanded, setExpanded] = useState(true);
 
   const handleChange = (nextChecked) => {
     setChecked(nextChecked);
@@ -56,7 +56,7 @@ const PManagement = ({participantsArray}) => {
           </div>
 
           <div>
-            {!checked && <OnStageOffScreen participantsArray={participantsArray}/>}
+            {!checked && <OnStageOffScreen participantsArray={participantsArray} setParticipantsArray={setParticipantsArray} />}
           </div>
         </div>
       )}

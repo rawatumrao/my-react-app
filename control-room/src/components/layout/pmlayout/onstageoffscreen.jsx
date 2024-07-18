@@ -8,7 +8,7 @@ import { IoMdMicOff, IoMdMic } from "react-icons/io";
 import { BsCameraVideoOffFill, BsCameraVideoFill } from "react-icons/bs";
 import "./onstageoffscreen.css";
 
-const OnStageOffScreen = ({ participantsArray }) => {
+const OnStageOffScreen = ({ participantsArray, setParticipantsArray }) => {
   const [onStageItems, setOnStageItems] = useState([]);
   const [offScreenItems, setOffScreenItems] = useState([]);
   const [data, setData] = useState(participantsArray);
@@ -55,6 +55,7 @@ const OnStageOffScreen = ({ participantsArray }) => {
     );
 
     setData(updatedData);
+    setParticipantsArray(updatedData); //Update the parent state with new data
   };
 
   const [onStageOpen, setOnStageOpen] = useState(false);
