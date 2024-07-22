@@ -7,17 +7,17 @@ import {
 import { useNavigate } from "react-router-dom";
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
 import {faChevronLeft, faChevronRight} from '@fortawesome/free-solid-svg-icons';
+import { mlayout1, mlayout2, mlayout3, mlayout4, mlayout5, mlayout6, mlayout7, mlayout8 } from "../../../config/imageConstants";
 
 const images = [
-  {host_layout: "1", imageUrl: "./images/mlayoutmain.png", Descrption: "One"},
-  {host_layout: "2", imageUrl: "./images/mlayouts1.png", Descrption: "two"},
-  {host_layout: "3", imageUrl: "./images/mlayouts2.png", Descrption: "three"},
-  {host_layout: "4", imageUrl: "./images/mlayouts3.png", Descrption: "four"},
-  {host_layout: "5", imageUrl: "./images/mlayouts4.png", Descrption: "five"},
-  {host_layout: "6", imageUrl: "./images/mlayouts5.png", Descrption: "six"},
-  {host_layout: "7", imageUrl: "./images/mlayouts6.png", Descrption: "seven"},
-  {host_layout: "8", imageUrl: "./images/mlayouts7.png", Descrption: "eight"},
-  {host_layout: "9", imageUrl: "./images/mlayouts8.png", Descrption: "nine"},
+  {host_layout: "1", imageUrl: mlayout1, Descrption: "One"},
+  {host_layout: "2", imageUrl: mlayout2, Descrption: "two"},
+  {host_layout: "3", imageUrl: mlayout3, Descrption: "three"},
+  {host_layout: "4", imageUrl: mlayout4, Descrption: "four"},
+  {host_layout: "5", imageUrl: mlayout5, Descrption: "five"},
+  {host_layout: "6", imageUrl: mlayout6, Descrption: "six"},
+  {host_layout: "7", imageUrl: mlayout7, Descrption: "seven"},
+  {host_layout: "8", imageUrl: mlayout8, Descrption: "eight"},
 ];
 
 const headerImage= "data:image/svg+xml;utf8,<svg width='140' height='88' viewBox='0 0 140 88' fill='none' xmlns='http://www.w3.org/2000/svg'>%0A%09<rect x='0.5' y='0.5' width='139' height='87' rx='3.5' fill='%2387919a' stroke='%23BBBFC3'/>%0A%09<rect x='8.0' y='27.0' width='59.5' height='34.0' rx='2' fill='%23BBBFC3'/>%0A%09<rect x='72.5' y='27.0' width='59.5' height='34.0' rx='2' fill='%23BBBFC3'/>%0A</svg>";

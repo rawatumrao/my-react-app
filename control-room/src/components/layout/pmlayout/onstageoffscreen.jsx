@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from "react";
+import PropTypes from "prop-types";
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import {
   MdOutlineKeyboardArrowDown,
   MdOutlineKeyboardArrowRight,
 } from "react-icons/md";
 import { IoMdMicOff, IoMdMic } from "react-icons/io";
+import { FaUserTie } from "react-icons/fa";
 import { BsCameraVideoOffFill, BsCameraVideoFill } from "react-icons/bs";
 import "./onstageoffscreen.css";
 
@@ -16,9 +18,19 @@ const OnStageOffScreen = ({ participantsArray, setParticipantsArray }) => {
   useEffect(() => {
     const loadItems = () => {
       const onStage = data
-        .filter((item) => item.spotlightOrder !== 0 && item.protocol !== "api" && item.protocol !== "rtmp")
+        .filter(
+          (item) =>
+            item.spotlightOrder !== 0 &&
+            item.protocol !== "api" &&
+            item.protocol !== "rtmp"
+        )
         .sort((a, b) => a.spotlightOrder - b.spotlightOrder);
-      const offScreen = data.filter((item) => item.spotlightOrder === 0 && item.protocol !== "api" && item.protocol !== "rtmp");
+      const offScreen = data.filter(
+        (item) =>
+          item.spotlightOrder === 0 &&
+          item.protocol !== "api" &&
+          item.protocol !== "rtmp"
+      );
       setOnStageItems(onStage);
       setOffScreenItems(offScreen);
     };
@@ -32,8 +44,10 @@ const OnStageOffScreen = ({ participantsArray, setParticipantsArray }) => {
       return;
     }
 
-    const sourceList = source.droppableId === "onStage" ? onStageItems : offScreenItems;
-    const destList = destination.droppableId === "onStage" ? onStageItems : offScreenItems;
+    const sourceList =
+      source.droppableId === "onStage" ? onStageItems : offScreenItems;
+    const destList =
+      destination.droppableId === "onStage" ? onStageItems : offScreenItems;
     const [movedItem] = sourceList.splice(source.index, 1);
 
     if (source.droppableId !== destination.droppableId) {
@@ -43,33 +57,66 @@ const OnStageOffScreen = ({ participantsArray, setParticipantsArray }) => {
     destList.splice(destination.index, 0, movedItem);
 
     if (destination.droppableId === "onStage") {
-      setOnStageItems(destList.filter(item => item.protocol !== "api" && item.protocol !== "rtmp").sort((a, b) => a.spotlightOrder - b.spotlightOrder));
+      setOnStageItems(
+        destList
+          .filter((item) => item.protocol !== "api" && item.protocol !== "rtmp")
+          .sort((a, b) => a.spotlightOrder - b.spotlightOrder)
+      );
       setOffScreenItems([...offScreenItems]);
     } else {
-      setOffScreenItems(destList.filter(item=> item.protocol !== "api" && item.protocol !== "rtmp"));
+      setOffScreenItems(
+        destList.filter(
+          (item) => item.protocol !== "api" && item.protocol !== "rtmp"
+        )
+      );
       setOnStageItems([...onStageItems]);
     }
 
     const updatedData = [...onStageItems, ...offScreenItems].map((item) =>
-      item.uuid === movedItem.uuid ? { ...item, spotlightOrder: movedItem.spotlightOrder } : item
+      item.uuid === movedItem.uuid
+        ? { ...item, spotlightOrder: movedItem.spotlightOrder }
+        : item
     );
 
     setData(updatedData);
     setParticipantsArray(updatedData); //Update the parent state with new data
+    localStorage.setItem("participants", JSON.stringify(updatedData)); // Persist to localstorage
   };
 
   const [onStageOpen, setOnStageOpen] = useState(false);
   const [offScreenOpen, setOffScreenOpen] = useState(false);
 
-  const [isMicMuted, setIsMicMuted] = useState(true);
-  const [isCameraOff, setIsCameraOff] = useState(true);
+  // const [isMicMuted, setIsMicMuted] = useState(true);
+  // const [isCameraOff, setIsCameraOff] = useState(true);
 
-  const toggleMic = () => {
-    setIsMicMuted(!isMicMuted);
+  // const toggleMic = () => {
+  //   setIsMicMuted(!isMicMuted);
+  // };
+
+  // const toggleCamera = () => {
+  //   setIsCameraOff(!isCameraOff);
+  // };
+
+  const toggleMic = (uuid) => {
+    const updatedParticipants = participantsArray.map((participant) => {
+      if (participant.uuid === uuid) {
+        return { ...participant, isMuted: !participant.isMuted };
+      }
+      return participant;
+    });
+    setParticipantsArray(updatedParticipants);
+    localStorage.setItem("participants", JSON.stringify(updatedParticipants)); //persist to local storage
   };
 
-  const toggleCamera = () => {
-    setIsCameraOff(!isCameraOff);
+  const toggleCamera = (uuid) => {
+    const updatedParticipants = participantsArray.map((participant) => {
+      if (participant.uuid === uuid) {
+        return { ...participant, isCameraMuted: !participant.isCameraMuted };
+      }
+      return participant;
+    });
+    setParticipantsArray(updatedParticipants);
+    localStorage.setItem("participants", JSON.stringify(updatedParticipants)); //persist to local storage
   };
 
   return (
@@ -105,16 +152,24 @@ const OnStageOffScreen = ({ participantsArray, setParticipantsArray }) => {
                           {...provided.dragHandleProps}
                           className="item"
                         >
-                          <span className="item-content">{item.displayName}</span>
+                          <span className="item-content">
+                            {item.displayName}
+                          </span>
                           <span className="">
-                            <span className="icon" onClick={toggleMic}>
+                            <span
+                              className="icon"
+                              onClick={() => toggleMic(item.uuid)}
+                            >
                               {item.isMuted ? (
                                 <IoMdMicOff color="red" />
                               ) : (
                                 <IoMdMic color="green" />
                               )}
                             </span>
-                            <span className="icon" onClick={toggleCamera}>
+                            <span
+                              className="icon"
+                              onClick={() => toggleCamera(item.uuid)}
+                            >
                               {item.isCameraMuted ? (
                                 <BsCameraVideoOffFill color="red" />
                               ) : (
@@ -122,7 +177,7 @@ const OnStageOffScreen = ({ participantsArray, setParticipantsArray }) => {
                               )}
                             </span>
                             {item.role === "chair" && (
-                              <span className="host">/Host</span>
+                              <FaUserTie color="blue" /> // Host Icon //<span className="host">/Host</span>
                             )}
                           </span>
                         </div>
@@ -165,15 +220,23 @@ const OnStageOffScreen = ({ participantsArray, setParticipantsArray }) => {
                           {...provided.dragHandleProps}
                           className="item"
                         >
-                          <span className="item-content">{item.displayName}</span>
-                          <span className="icon" onClick={toggleMic}>
+                          <span className="item-content">
+                            {item.displayName}
+                          </span>
+                          <span
+                            className="icon"
+                            onClick={() => toggleMic(item.uuid)}
+                          >
                             {item.isMuted ? (
                               <IoMdMicOff color="red" />
                             ) : (
                               <IoMdMic color="green" />
                             )}
                           </span>
-                          <span className="icon" onClick={toggleCamera}>
+                          <span
+                            className="icon"
+                            onClick={() => toggleCamera(item.uuid)}
+                          >
                             {item.isCameraMuted ? (
                               <BsCameraVideoOffFill color="red" />
                             ) : (
@@ -193,6 +256,21 @@ const OnStageOffScreen = ({ participantsArray, setParticipantsArray }) => {
       </div>
     </DragDropContext>
   );
+};
+
+OnStageOffScreen.PropTypes = {
+  participantsArray: PropTypes.arrayOf(
+    PropTypes.shape({
+      uuid: PropTypes.string.isRequired,
+      displayName: PropTypes.string.isRequired,
+      spotlightOrder: PropTypes.number.isRequired,
+      protocol: PropTypes.string,
+      isMuted: PropTypes.bool,
+      isCameraMuted: PropTypes.bool,
+      role: PropTypes.string,
+    })
+  ).isRequired,
+  setParticipantsArray: PropTypes.func.isRequired,
 };
 
 export default OnStageOffScreen;

@@ -9,8 +9,8 @@ export const ENV = ENVIRONMENT.dev;
 
 // parent page vars
 export const EVENT_ID =
-  ENV === ENVIRONMENT.dev ? "53233" : parent.parent.vbConference;
-export const PIN = ENV === ENVIRONMENT.dev ? "8572041" : parent.parent.vbPin;
+  ENV === ENVIRONMENT.dev ? "123" : parent.parent.vbConference;
+export const PIN = ENV === ENVIRONMENT.dev ? "123" : parent.parent.vbPin;
 export const NODE_ADDRESS =
   ENV === ENVIRONMENT.dev
     ? "alphacn.webcasts.com"
