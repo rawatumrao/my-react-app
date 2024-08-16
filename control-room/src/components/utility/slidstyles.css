@@ -1,38 +1,38 @@
 .carousel {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 100%;
-    position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  position: relative;
 }
 
 .arrow {
-    background: none;
-    border: none;
-    color: white;
-    font-size: 2rem;
-    cursor: pointer;
-    position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
-    z-index: 1;
+  background: none;
+  border: none;
+  color: white;
+  font-size: 2rem;
+  cursor: pointer;
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 1;
 }
 
 .arrow:first-of-type {
-    left: 0;
+  left: 0;
 }
 
 .arrow:last-of-type {
-    right: 0;
+  right: 0;
 }
 
 .imageContainer {
-    display: flex;
-    overflow: hidden;
+  display: flex;
+  overflow: hidden;
 }
 
 .image {
-    width: calc(100%/5);
-    object-fit: cover;
-    margin: 0 5px;
+  width: calc(100% / 5);
+  object-fit: cover;
+  margin: 0 5px;
 }
