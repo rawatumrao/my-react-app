@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import "./mediaStyle.css";
 
 import { useNavigate } from "react-router-dom";
@@ -22,13 +22,12 @@ const Media = ({ mLayout }) => {
 
   const handleImageClick = (image) => {
     mLayout(image.host_layout);
-    setSelectedImage(prevImage=>(prevImage===image ? null : image));
+    setSelectedImage((prevImage) => (prevImage === image ? null : image));
   };
 
-  const handleDoubleClick = (image) =>{
+  const handleDoubleClick = (image) => {
     setSelectedImage(image);
-  }
-  
+  };
 
   const toggleExpandCollapse = () => {
     setExpanded(!expanded);
@@ -45,16 +44,16 @@ const Media = ({ mLayout }) => {
   };
 
   const handleSeeAllClick = () => {
-    navigate("/view-all");
+    navigate("/media-all-view");
   };
 
   return (
     <div className="expand-collapse-container">
       <div className="header">
-      {!expanded ? (
+        {!expanded ? (
           <>
             <span className="expand-button" onClick={toggleExpandCollapse}>
-            <FontAwesomeIcon icon={faAngleRight} />Media Layout
+              <FontAwesomeIcon icon={faAngleRight} /> Media Layout
             </span>
             <span className="">
               <img className="header-image" src={mediaHeaderImage}></img>
@@ -63,7 +62,7 @@ const Media = ({ mLayout }) => {
         ) : (
           <>
             <span className="collapse-button" onClick={toggleExpandCollapse}>
-            <FontAwesomeIcon icon={faAngleDown} />Media Layout
+              <FontAwesomeIcon icon={faAngleDown} /> Media Layout
             </span>
             <span className="see-all" onClick={handleSeeAllClick}>
               See All
@@ -84,7 +83,11 @@ const Media = ({ mLayout }) => {
               .map((image, index) => (
                 <img
                   key={index}
-                  src={selectedImage?.imageUrl === image.imageUrl ? image.selectedImageUrl : image.imageUrl}
+                  src={
+                    selectedImage?.imageUrl === image.imageUrl
+                      ? image.selectedImageUrl
+                      : image.imageUrl
+                  }
                   alt={`Image ${index + 1}`}
                   onClick={() => handleImageClick(image)}
                   onDoubleClick={() => handleDoubleClick(image)}

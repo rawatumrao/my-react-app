@@ -1,11 +1,11 @@
 import { EVENT_ID, NODE_ADDRESS, INITIAL_TOKEN } from "../constants/constants";
 
 const fetchWithWithoutRetry = async (url, options) => {
-      const response = await fetch(url, options);
-      if (!response.ok) {
-        throw new Error(`HTTP error! status:: ${response.status}`);
-      }
-      return response;
+  const response = await fetch(url, options);
+  if (!response.ok) {
+    throw new Error(`HTTP error! status:: ${response.status}`);
+  }
+  return response;
 };
 
 const fetchWithRetry = async (url, options, retries = 3) => {
@@ -56,7 +56,7 @@ const fetchWithRetryWithTimeout = async (
 };
 
 export const participantsPostFetch = async (data) => {
-  await fetch(
+  let fetchRequest = await fetch(
     `https://${NODE_ADDRESS}/api/client/v2/conferences/${EVENT_ID}/participants/${data.uuid}/${data.call}`,
     {
       method: "POST",
@@ -66,10 +66,16 @@ export const participantsPostFetch = async (data) => {
       },
     }
   );
+
+  let response = await fetchRequest.json();
+  let result = await response.result;
+
+  if (typeof result != "boolean") result = false;
+  return result;
 };
 
 export const participantsPostWithBody = async (data) => {
-  await fetch(
+  let fetchRequest = await fetch(
     `https://${NODE_ADDRESS}/api/client/v2/conferences/${EVENT_ID}/participants/${data.uuid}/${data.call}`,
     {
       method: "POST",
@@ -80,6 +86,12 @@ export const participantsPostWithBody = async (data) => {
       body: JSON.stringify(data.body),
     }
   );
+
+  let response = await fetchRequest.json();
+  let result = await response.result;
+
+  if (typeof result != "boolean") result = false;
+  return result;
 };
 
 export const conferencePostFetch = async (data) => {

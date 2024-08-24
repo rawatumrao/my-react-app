@@ -1,3 +1,7 @@
+.presenterManagment {
+  flex-grow: 1;
+}
+
 .switch {
-    cursor: pointer;
+  cursor: pointer;
 }

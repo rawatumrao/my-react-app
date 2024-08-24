@@ -14,7 +14,7 @@ const SAVED_PARTICIPANTS = pexipDataJsonVar?.saveVbParticpants
   : [];
 export const YOUR_VB_UUID =
   ENV === ENVIRONMENT.dev
-    ? "b4c788fa-fe44-4081-863c-52a3d4f66194"
+    ? "fb601120-4bd9-45de-9960-16378973114e"
     : pexipDataJsonVar?.myVBuuid;
 export const EVENT_ID =
   ENV === ENVIRONMENT.dev ? "123" : pexipDataJsonVar?.vbConference;
@@ -51,6 +51,20 @@ export const PRESENTER_ORDER = pexipDataJsonVar?.presentersOrder
 export const STREAMS_ORDER = pexipDataJsonVar?.streamsOrder
   ? pexipDataJsonVar?.streamsOrder
   : [];
+export const ROLE_STATUS = ENV === ENVIRONMENT.dev ? true : false;
+export const LAYOUT_PANEL_VIEWER = (layout) => {
+  ENV === ENVIRONMENT.dev
+    ? console.log(layout)
+    : pexipDataJsonVar?.changeViewerLayout(layout);
+};
+
+export const LAYOUTS = {
+  LAYOUT_DEFAULT_VIDEO: "LAYOUT_DEFAULT_VIDEO",
+  LAYOUT_VIDEO_LARGE: "LAYOUT_VIDEO_LARGE",
+  LAYOUT_SLIDE_LARGE: "LAYOUT_SLIDE_LARGE",
+  LAYOUT_VIDEO_ONLY: "LAYOUT_VIDEO_ONLY",
+  LAYOUT_SLIDE_ONLY: "LAYOUT_SLIDE_ONLY",
+};
 
 export const EVENTS = {
   token_refresh: "token_refresh",
@@ -71,9 +85,6 @@ export const EVENTS = {
   message: "message",
   conferenceStatus: "conferenceStatus",
   orderedList: "orderedList",
-  audioMuteMsg: "audioMuteMsg",
-  videoMuteMsg: "videoMuteMsg",
-  videoUnmuteMsg: "videoUnmuteMsg",
   sendMsg: "sendMsg",
 };
 
@@ -106,35 +117,33 @@ export const ROLES = {
 };
 
 export const ALT_TAGS = {
-  spotlightOn: "Spotlight On",
-  spotlightOff: "Spotlight Off",
-  videoOff: "Video Off",
-  videoOn: "Video On",
-  audioOff: "Audio Off",
-  audioOn: "Audio On",
+  spotlightOn: "Turn Spotlight On",
+  spotlightOff: "Turn Spotlight Off",
+  videoOff: "Stop Video",
+  videoOn: "Start Video",
+  audioOff: "Stop Audio",
+  audioOn: "Start Audio",
   makeHost: "Make Host",
   makeguest: "Make Guest",
-  remove: "Remove Participant",
+  remove: "Remove Presenter",
   raiseHand: "Raise Hand",
   loweredHand: "Lower Hand",
   allowShares: "Enable Receive Shares",
   denyShares: "Disable Receive Shares",
-  openDtmf: "Open DTMP Keypad",
+  openDtmf: "Open DTMF Keypad",
   editProfile: "Edit Presenter Profile",
   submitNewOverlayName: "Submit New Overlay Name",
   admit: "Admit",
   deny: "Deny",
   openActionMenu: "Open Action Menu",
   cancel: "Cancel",
-  screenShare: "Screensharing",
-  switchOff: "Switch Off",
-  switchOn: "Switch On",
+  screenShare: "Sharing Screen",
 };
 
 export const BUTTON_NAMES = {
   video: "video",
   audio: "audio",
-  spolight: "spolight",
+  spotlight: "spotlight",
   admit: "admit",
   deny: "deny",
   openDTMFKeypad: "Open DTMF Keypad",
@@ -158,7 +167,7 @@ export const LABEL_NAMES = {
   protocol: "Protocol",
   removeDialog1: "Are you sure you want to remove",
   removeDialog2: "from this meeting?",
-  editProfileErrorMsgNameTxt: "Name can not be blank.",
+  editProfileErrorMsgNameTxt: "Name cannot be blank.",
   unknown: "Unknown",
   removeDialogErrorMsg1: "Please try again to remove",
   removeDialogErrorMsg2: "from this meeting.",
@@ -169,9 +178,20 @@ export const LABEL_NAMES = {
   errorContentshareDisabled1: "Failed to disabled content share for",
   errorContentshareDisabled2: "Please try again.",
   unMutedAudioBtnPressMsg: "A Host has requested you unmute your Microphone.",
-  unMutedBtnVideoPressMsg: "A Host has requested you turn your Camera on.",
+  unMutedBtnVideoPressMsg: "A Host has turned your Video on.",
   muteBtnVideoPressMsg: "A Host has turned your Video off.",
-  applyChangesFailed: "Your applied changes have failed.  Please try again.",
+  yourMuteBtnVideosMsg: "Camera Off.",
+  yourUnMuteBtnVideoMsg: "Camera On.",
+  yourAudioMuteMsg: "Audio Off.",
+  yourAudioUnmuteMsg: "Audio On.",
+  video: "video",
+  audio: "audio",
+  tooManyPresenters: `You have exceeded the ${MAX_PARTICIPANTS} presenter limit. Please disconnect any additional presenters to proceed.`,
+  // live in videobridge.jsp pexipDataJson.showVbMsg function
+  muteLocalVideoMsg:
+    "A host has stopped your video. Your camera is still connected.",
+  unMuteLocalVideoMsg:
+    "A host has requested to turn your video on. Please make sure your camera is unmuted.",
 };
 
 export const PROTOCOLS = {

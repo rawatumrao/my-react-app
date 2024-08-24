@@ -2,26 +2,34 @@ html {
   background-color: #1d1f2e !important;
 }
 
+#root {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-height: 100vh;
+}
+
 body {
-  background-color: black;
-  padding: 0px 0px;
-  margin: 5 5px;
+  padding: 0px;
+  margin: 0px;
   overflow-x: hidden;
 }
 
+.applyBtnDiv {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 15px;
+}
+
 .btn {
-  position: relative;
-  top: auto;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  -ms-transform: translate(-50%, -50%);
   background-color: rgb(26, 24, 37);
   color: white;
   font-size: 16px;
   padding: 10px 40px;
   border: none;
   cursor: pointer;
-  border-radius: 5px;
+  border-radius: var(--button-borderRadius);
   text-align: center;
 }
 
@@ -38,6 +46,7 @@ body {
   --red-icons: #c2185b;
   --green-icons: #19c75f;
   --yellow-icons: #ffdc81;
+  --onStage-bgColor: #5e609c;
 }
 
 button {

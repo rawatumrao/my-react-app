@@ -21,18 +21,23 @@ export const sortParticipants = (users, protocols, host, rtmp) => {
       users.forEach((user) => {
         if (
           user.protocol === protocol &&
-          user.serviceType !== SERVICE_TYPE.waiting_room
-        )
+          user.serviceType !== SERVICE_TYPE.waiting_room &&
+          user.isStreaming === false &&
+          user.displayName.includes("API Control User") === false &&
+          user.has_media &&
+          user.is_audio_only_call === false // hide phone presenter
+        ) {
           filteredUers.push(user);
+        }
       });
     });
   } else {
     users.forEach((user) => {
       if (
         user.isStreaming === false &&
-        user.displayName.includes("api ") === false &&
-        user.displayName.includes("API ") === false &&
-        user.has_media
+        user.displayName.includes("API Control User") === false &&
+        user.has_media &&
+        user.is_audio_only_call === false // hide phone presenter
       )
         filteredUers.push(user);
     });

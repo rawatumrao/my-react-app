@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "../media/mediaStyle.css";
 import "./viewalllayoutStyle.css";
@@ -12,17 +12,14 @@ const ViewAllLayout = ({ setPresenterAllLayout }) => {
     navigate("/");
   };
 
- 
   const handleImageClick = (image) => {
-
     setPresenterAllLayout(image.layout);
-    setSelectedImage(prevImage=>(prevImage===image ? null : image));
+    setSelectedImage((prevImage) => (prevImage === image ? null : image));
   };
 
-  const handleDoubleClick = (image) =>{
+  const handleDoubleClick = (image) => {
     setSelectedImage(image);
-  }
-  
+  };
 
   const categorizeImages = (category) => {
     return images.filter((image) => image.scope.startsWith(category));
@@ -45,7 +42,11 @@ const ViewAllLayout = ({ setPresenterAllLayout }) => {
             {adaptiveImages.map((image, index) => (
               <div key={index} className="box">
                 <img
-                  src={selectedImage?.imageUrl === image.imageUrl ? image.selectedImageUrl : image.imageUrl}
+                  src={
+                    selectedImage?.imageUrl === image.imageUrl
+                      ? image.selectedImageUrl
+                      : image.imageUrl
+                  }
                   alt={`Image ${index + 1}`}
                   className={`image ${
                     selectedImage === image.layout ? "selected" : ""
@@ -63,7 +64,11 @@ const ViewAllLayout = ({ setPresenterAllLayout }) => {
             {speakerFocusedImages.map((image, index) => (
               <div key={index} className="box">
                 <img
-                  src={selectedImage?.imageUrl === image.imageUrl ? image.selectedImageUrl : image.imageUrl}
+                  src={
+                    selectedImage?.imageUrl === image.imageUrl
+                      ? image.selectedImageUrl
+                      : image.imageUrl
+                  }
                   alt={`Image ${index + 1}`}
                   onClick={() => handleImageClick(image)}
                   onDoubleClick={() => handleDoubleClick(image)}
@@ -81,7 +86,11 @@ const ViewAllLayout = ({ setPresenterAllLayout }) => {
             {equalSizeImages.map((image, index) => (
               <div key={index} className="box">
                 <img
-                  src={selectedImage?.imageUrl === image.imageUrl ? image.selectedImageUrl : image.imageUrl}
+                  src={
+                    selectedImage?.imageUrl === image.imageUrl
+                      ? image.selectedImageUrl
+                      : image.imageUrl
+                  }
                   alt={`Image ${index + 1}`}
                   onClick={() => handleImageClick(image)}
                   onDoubleClick={() => handleDoubleClick(image)}
@@ -99,7 +108,11 @@ const ViewAllLayout = ({ setPresenterAllLayout }) => {
             {largeGroupImages.map((image, index) => (
               <div key={index} className="box">
                 <img
-                  src={selectedImage?.imageUrl === image.imageUrl ? image.selectedImageUrl : image.imageUrl}
+                  src={
+                    selectedImage?.imageUrl === image.imageUrl
+                      ? image.selectedImageUrl
+                      : image.imageUrl
+                  }
                   alt={`Image ${index + 1}`}
                   onClick={() => handleImageClick(image)}
                   onDoubleClick={() => handleDoubleClick(image)}

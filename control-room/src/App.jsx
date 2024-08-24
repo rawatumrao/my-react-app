@@ -31,6 +31,7 @@ import {
   numberToWords,
 } from "./constants/imageConstants.js";
 import { findRoleOfUser, sortParticipants } from "./utils/categorizeFuncs.js";
+import ViewAllMediaLayout from "./components/layout/mediaallview/viewallmeidalayout.jsx";
 
 const bc = new BroadcastChannel("pexip");
 
@@ -38,6 +39,7 @@ function App() {
   const [presenterLayout, setPresenterLayout] = useState(null);
   const [presenterAllLayout, setPresenterAllLayout] = useState(null);
   const [mediaLayout, setMediaLayout] = useState(null);
+  const [mediaAllLayout, setMediaAllLayout] = useState(null);
   const [voiceActivated, setVoiceActivated] = useState(false);
   const [participantsArray, setParticipantsArray] = useState(
     createData(INITIAL_PARTICIPANT)
@@ -102,14 +104,15 @@ function App() {
         return (
           participant &&
           participant.layout_group !== null &&
-          participant.layout_group !== "" && participant.layout_group !== "" &&
+          participant.layout_group !== "" &&
+          participant.layout_group !== "" &&
           participant.layout_group !== participantWithOldDetails.layout_group
         );
       });
       let offScreenParticipants = participantsArray.filter((participant) => {
         //console.log("all participant including OffScreenParticipants are here :",participant );
-       
-        return (participant && participant.layout_group === "");
+
+        return participant && participant.layout_group === "";
       });
 
       if (voiceActivated) {
@@ -140,7 +143,7 @@ function App() {
 
         let onStageParticipantsForCount = participantsArray.filter(
           (participant) => participant?.layout_group
-        )
+        );
         let parNumber = onStageParticipantsForCount.length;
         if (parNumber > 0) {
           let count = getParticipantsNumber(selectedLayout);
@@ -178,7 +181,6 @@ function App() {
               });
             }
           }
-
         } else {
           await transformLayout({
             token: Data.current.token,
@@ -186,7 +188,10 @@ function App() {
           });
 
           if (offScreenParticipants.length > 0) {
-            console.log("offScreenParticipants.length is more than zero", offScreenParticipants);
+            console.log(
+              "offScreenParticipants.length is more than zero",
+              offScreenParticipants
+            );
             for (const participant of offScreenParticipants) {
               await clearParticipantFromLayoutGroup({
                 uuid: participant.uuid,
@@ -222,6 +227,15 @@ function App() {
     setPresenterAllLayout(layout);
     setPresenterLayout(null); // Clear the other selection
   };
+  const handleMediaLayoutChange = (layout) => {
+    setMediaLayout(layout);
+    setMediaAllLayout(null); // Clear the other selection
+  };
+  const handleMediaAllLayoutChange = (layout) => {
+    setMediaAllLayout(layout);
+    setMediaLayout(null); // Clear the other selection
+  };
+
 
   return (
     <>
@@ -252,16 +266,18 @@ function App() {
                       false
                     )}
                     pLayout={handlePresenterLayoutChange}
-                    mLayout={setMediaLayout}
+                    mLayout={handleMediaLayoutChange}
                     setParticipantsArray={setParticipantsArray}
                     header={HEADERS.presenters}
                     roleStatus={roleStatus}
                     talkingPplArray={[]}
                     pexipBroadCastChannel={bc}
                   />
-                  <button className="btn" onClick={handleApplyClick}>
-                    Apply
-                  </button>
+                  <div id="applyBtnDiv" className="applyBtnDiv">
+                    <button className="btn" onClick={handleApplyClick}>
+                      Apply
+                    </button>
+                  </div>
                 </>
               }
             />
@@ -270,6 +286,14 @@ function App() {
               element={
                 <ViewAllLayout
                   setPresenterAllLayout={handlePresenterAllLayoutChange}
+                />
+              }
+            />
+            <Route
+              path="/media-all-view"
+              element={
+                <ViewAllMediaLayout
+                  setMediaAllLayout={handleMediaAllLayoutChange}
                 />
               }
             />

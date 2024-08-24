@@ -1,10 +1,8 @@
 /* Container for the expand/collapse conponent */
 .expand-collapse-container {
   padding: 1px;
-  background-color: black;
   border-radius: 2px;
   gap: 5px;
-  margin: 0 5px;
 }
 
 /* Header styling */
@@ -26,7 +24,6 @@
 
 .expand-button,
 .collapse-button {
-  background-color: black;
   color: white;
   border: none;
   padding: 10px 10px;
@@ -51,7 +48,6 @@
 }
 
 .nav-button {
-  background-color: black;
   color: white;
   border: none;
   padding: 10px;
@@ -138,8 +134,8 @@
   transform: translateY(-50%);
 }
 .view-all-layout {
+  flex-grow: 1;
   padding: 5px;
-  background-color: black;
   color: rgb(236, 13, 13);
   text-align: left;
 }

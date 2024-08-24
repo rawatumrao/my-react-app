@@ -1,7 +1,8 @@
-import React from "react";
+import { useEffect, useState } from "react";
 import Presenter from "../layout/presenter/presenter.jsx";
 import PManagement from "../layout/prmanagement/pmanagement.jsx";
 import Media from "../layout/media/media.jsx";
+import { getTotalCapacity } from "../../constants/imageConstants.js";
 
 const ComponentWrapper = ({
   participantsArray,
@@ -14,9 +15,19 @@ const ComponentWrapper = ({
   talkingPplArray,
   pexipBroadCastChannel,
 }) => {
+  const [layoutSize, setLayoutSize] = useState(20);
+  const [selectedLayout, setSelectedLayout] = useState(null);
+
+  useEffect(() => {
+    if (selectedLayout) {
+      const newSize = getTotalCapacity(selectedLayout);
+      setLayoutSize(newSize || 20);
+    }
+  }, [selectedLayout]);
+
   return (
     <>
-      <Presenter pLayout={pLayout} />
+      <Presenter pLayout={pLayout} setSelectedLayout={setSelectedLayout} />
       <Media mLayout={mLayout} />
       <PManagement
         participantsArray={participantsArray}
@@ -26,6 +37,7 @@ const ComponentWrapper = ({
         roleStatus={roleStatus}
         talkingPplArray={talkingPplArray}
         pexipBroadCastChannel={pexipBroadCastChannel}
+        layoutSize={layoutSize}
       />
     </>
   );

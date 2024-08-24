@@ -3,7 +3,6 @@
   flex-direction: column;
   justify-content: space-around;
   padding: 15px;
-  background-color: black;
   color: #ffffff;
   height: auto;
   box-sizing: border-box;
@@ -18,6 +17,7 @@
 
 .list-container {
   width: 100%;
+  margin-bottom: 10px;
 }
 
 .list-container h2 {
@@ -28,8 +28,8 @@
 }
 
 .list {
-  background-color: #160b0b;
-  border-radius: 8px;
+  /* background-color: #160b0b; */
+  border-radius: var(--button-borderRadius);
   padding: 10px;
 }
 
@@ -37,16 +37,17 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background-color: black;
   padding: 10px;
-  margin-bottom: 10px;
+  margin-bottom: 5px;
   border-radius: 4px;
   color: #ffffff;
   cursor: grab;
   text-align: left;
 }
 
-.item-content{
+.item-content {
+  display: flex;
+  align-items: center;
   flex: 1;
   text-align: left;
 }
@@ -54,14 +55,12 @@
 .icon-container {
   display: flex;
   align-items: center;
+  justify-content: center;
   width: 25px;
   height: 25px;
-  background-color:#160b0b;;
-  padding: '5px';
-  border-radius: '15%';
-  border: '2px solid transparent';
+  /* background-color: #160b0b; */
+  border-radius: "15%";
+  border: "2px solid transparent";
   cursor: pointer;
-  position: relative;
-  margin-left: 10px;
-  float: right;
+  margin-right: 10px;
 }

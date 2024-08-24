@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import "../media/mediaStyle.css";
 import { images, headerImage } from "../../../constants/imageConstants.js";
 
@@ -11,7 +11,7 @@ import {
   faAngleRight,
 } from "@fortawesome/free-solid-svg-icons";
 
-const Presenter = ({ pLayout }) => {
+const Presenter = ({ pLayout, setSelectedLayout }) => {
   const [expanded, setExpanded] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [selectedImage, setSelectedImage] = useState(null);
@@ -19,14 +19,14 @@ const Presenter = ({ pLayout }) => {
   const navigate = useNavigate();
 
   const handleImageClick = (image) => {
-
     pLayout(image.layout);
-    setSelectedImage(prevImage=>(prevImage===image ? null : image));
+    setSelectedLayout(image.layout);
+    setSelectedImage((prevImage) => (prevImage === image ? null : image));
   };
 
-  const handleDoubleClick = (image) =>{
+  const handleDoubleClick = (image) => {
     setSelectedImage(image);
-  }
+  };
 
   const toggleExpandCollapse = () => {
     setExpanded(!expanded);
@@ -45,6 +45,9 @@ const Presenter = ({ pLayout }) => {
   const handleSeeAllClick = () => {
     navigate("/view-all");
   };
+  const sortedImages = [...images].sort((a, b) => {
+    return a.participantsNumber - b.participantsNumber;
+  });
 
   return (
     <div className="expand-collapse-container">
@@ -52,7 +55,7 @@ const Presenter = ({ pLayout }) => {
         {!expanded ? (
           <>
             <span className="expand-button" onClick={toggleExpandCollapse}>
-            <FontAwesomeIcon icon={faAngleRight} /> Presenter Layout
+              <FontAwesomeIcon icon={faAngleRight} /> Presenter Layout
             </span>
             <span className="">
               <img className="header-image" src={headerImage}></img>
@@ -61,7 +64,7 @@ const Presenter = ({ pLayout }) => {
         ) : (
           <>
             <span className="collapse-button" onClick={toggleExpandCollapse}>
-            <FontAwesomeIcon icon={faAngleDown} /> Presenter Layout
+              <FontAwesomeIcon icon={faAngleDown} /> Presenter Layout
             </span>
             <span className="see-all" onClick={handleSeeAllClick}>
               See All
@@ -77,12 +80,16 @@ const Presenter = ({ pLayout }) => {
             onClick={handlePrev}
           />
           <div className="images">
-            {images
+            {sortedImages
               .slice(currentImageIndex, currentImageIndex + 7)
               .map((image, index) => (
                 <img
                   key={index}
-                  src={selectedImage?.imageUrl === image.imageUrl ? image.selectedImageUrl : image.imageUrl}
+                  src={
+                    selectedImage?.imageUrl === image.imageUrl
+                      ? image.selectedImageUrl
+                      : image.imageUrl
+                  }
                   alt={`Image ${index + 1}`}
                   onClick={() => handleImageClick(image)}
                   onDoubleClick={() => handleDoubleClick(image)}

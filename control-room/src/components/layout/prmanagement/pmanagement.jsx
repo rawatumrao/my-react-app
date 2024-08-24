@@ -1,5 +1,5 @@
-import React, { useContext, useState } from "react";
-import PropTypes from "prop-types";
+import { useContext, useState } from "react";
+import { PropTypes } from "prop-types";
 import "../media/mediaStyle.css";
 import "./pmanagementStyle.css";
 import VoiceActivated from "./voice-activated/voiceActivated.jsx";
@@ -22,6 +22,7 @@ const PManagement = ({
   roleStatus,
   talkingPplArray,
   pexipBroadCastChannel,
+  layoutSize,
 }) => {
   const { setVoiceActivated } = useContext(AppContext);
   const [checked, setChecked] = useState(false);
@@ -37,11 +38,11 @@ const PManagement = ({
   };
 
   return (
-    <div className="expand-collapse-container">
+    <div className="expand-collapse-container presenterManagment">
       <div className="header">
         <span className="expand-button" onClick={toggleExpandCollapse}>
           <FontAwesomeIcon icon={expanded ? faAngleDown : faAngleRight} />
-          Presenter Management
+          {` Presenter Management`}
         </span>
       </div>
       {expanded && (
@@ -54,8 +55,8 @@ const PManagement = ({
                 <div
                   className="switch"
                   onClick={handleChange}
-                  alt={checked ? ALT_TAGS.switchOn : ALT_TAGS.switchOff }
-                  title={checked ? ALT_TAGS.switchOn : ALT_TAGS.switchOff }
+                  alt={checked ? ALT_TAGS.switchOn : ALT_TAGS.switchOff}
+                  title={checked ? ALT_TAGS.switchOn : ALT_TAGS.switchOff}
                 >
                   <FontAwesomeIcon
                     icon={checked ? faToggleOn : faToggleOff}
@@ -77,6 +78,7 @@ const PManagement = ({
                 roleStatus={roleStatus}
                 talkingPplArray={talkingPplArray}
                 pexipBroadCastChannel={pexipBroadCastChannel}
+                layoutSize={layoutSize}
               />
             )}
           </div>
@@ -103,6 +105,7 @@ PManagement.propTypes = {
   roleStatus: PropTypes.bool,
   talkingPplArray: PropTypes.array,
   pexipBroadCastChannel: PropTypes.object,
+  layoutSize: PropTypes.number.isRequired,
 };
 
 export default PManagement;
