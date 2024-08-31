@@ -13,6 +13,11 @@ import {
   LABEL_NAMES,
   HEADERS,
   PARTICIPANTS_LIST_PROTOCOLS,
+  ROLE_STATUS,
+  CONTROL_ROOM_PRESENTER_LAYOUT,
+  CONTROL_ROOM_MEDIA_LAYOUT,
+  CONTROL_ROOM_VOICE_ACTIVATED,
+  LAYOUT_PANEL_VIEWER,
 } from "./constants/constants.js";
 import { AppContext } from "././contexts/context";
 import { createData } from "././utils/processJsonData";
@@ -32,22 +37,46 @@ import {
 } from "./constants/imageConstants.js";
 import { findRoleOfUser, sortParticipants } from "./utils/categorizeFuncs.js";
 import ViewAllMediaLayout from "./components/layout/mediaallview/viewallmeidalayout.jsx";
+import { getLayoutName } from "./utils/layoutFuncs.js";
 
 const bc = new BroadcastChannel("pexip");
 
 function App() {
-  const [presenterLayout, setPresenterLayout] = useState(null);
-  const [presenterAllLayout, setPresenterAllLayout] = useState(null);
-  const [mediaLayout, setMediaLayout] = useState(null);
-  const [mediaAllLayout, setMediaAllLayout] = useState(null);
-  const [voiceActivated, setVoiceActivated] = useState(false);
+  const [presenterLayout, setPresenterLayout] = useState(
+    CONTROL_ROOM_PRESENTER_LAYOUT
+  );
+  const [presenterAllLayout, setPresenterAllLayout] = useState(
+    CONTROL_ROOM_PRESENTER_LAYOUT
+  );
+  const [mediaLayout, setMediaLayout] = useState(CONTROL_ROOM_MEDIA_LAYOUT);
+  const [voiceActivated, setVoiceActivated] = useState(
+    CONTROL_ROOM_VOICE_ACTIVATED
+  );
   const [participantsArray, setParticipantsArray] = useState(
     createData(INITIAL_PARTICIPANT)
   );
-  const [roleStatus, setRoleStatus] = useState(false);
-  const [initialParticipantsArray, setInitialParticipantsArray] =
-    useState(participantsArray);
+  const [roleStatus, setRoleStatus] = useState(ROLE_STATUS);
+  const [initialParticipantsArray, setInitialParticipantsArray] = useState(null);
+  const [currentLayout, setCurentlayout] = useState(null);
+  const [currentPinValue, setCurrentPinValue] = useState(null);
   const Data = useRef({ token: INITIAL_TOKEN });
+  const prevMediaLayout = useRef();
+
+  const applyTransformLayout = async (selectedLayout) => {
+    if (selectedLayout !== currentLayout) {
+      try {
+        await transformLayout({
+          token: Data.current.token,
+          body: { transforms: { layout: selectedLayout } },
+        });
+        setCurentlayout(selectedLayout);
+      } catch (error) {
+        console.error("Error applying new layout: ", error);
+      }
+    } else {
+      console.log("New layout is the same as the current layout.");
+    }
+  };
 
   useEffect(() => {
     if (ENV === ENVIRONMENT.prod) {
@@ -59,7 +88,6 @@ function App() {
             let updatedData = createData(data.result);
             setParticipantsArray(updatedData);
             setRoleStatus(findRoleOfUser(updatedData));
-            setInitialParticipantsArray(updatedData);
             return;
           })
           .catch((error) => console.error(error));
@@ -82,11 +110,11 @@ function App() {
         let updatedData = createData(msg.data.info.participants);
         Data.current.meRole = findRoleOfUser(updatedData);
         setParticipantsArray(updatedData);
-        setInitialParticipantsArray(updatedData); // Save initial state
         console.log(msg.data.info.participants);
       }
     };
-  }, [participantsArray]);
+  }, []);
+
   // Setting up presenter and media layout by clicking on apply button
   const handleApplyClick = useCallback(async () => {
     try {
@@ -97,35 +125,61 @@ function App() {
         const errorMessage = "Please select valid Layout to Apply your changes";
         throw new ValidationError(errorMessage);
       }
-      let onStageParticipants = participantsArray.filter((participant) => {
-        const participantWithOldDetails = initialParticipantsArray.find(
-          (p) => p.uuid === participant.uuid
-        );
-        return (
-          participant &&
-          participant.layout_group !== null &&
-          participant.layout_group !== "" &&
-          participant.layout_group !== "" &&
-          participant.layout_group !== participantWithOldDetails.layout_group
-        );
-      });
-      let offScreenParticipants = participantsArray.filter((participant) => {
-        //console.log("all participant including OffScreenParticipants are here :",participant );
+        console.log("participantsArray value in app file", participantsArray);
+        console.log("initialParticipantsArray value in app file", initialParticipantsArray);
 
-        return participant && participant.layout_group === "";
-      });
+        //************************************* */
+
+        if (initialParticipantsArray === null){
+
+          let onStageParticipants = participantsArray.filter(
+            (participant) => participant?.layout_group
+          );
+
+          let offScreenParticipants = null;
+
+        } else{
+          let onStageParticipants = participantsArray.filter((participant) => {
+            const participantWithOldDetails = initialParticipantsArray.find(
+              (p) => p.uuid === participant.uuid
+            );
+            console.log("checking participantWithOldDetails for onStage", participantWithOldDetails);
+            return (
+              participant &&
+              participant.layout_group !== null &&
+              participant.layout_group !== participantWithOldDetails?.layout_group
+            );
+          });
+    
+          let offScreenParticipants = participantsArray.filter((participant) => {
+            const participantWithOldDetails = initialParticipantsArray.find(
+              (p) => p.uuid === participant.uuid
+            );
+            console.log("checking participantWithOldDetails for offscreen", participantWithOldDetails);
+            return (
+              participant &&
+              participant.layout_group === null &&
+              participant.layout_group !== participantWithOldDetails?.layout_group
+            );
+          });
+          
+        }
+
+     
+
+//***************************************** */
+      //setInitialParticipantsArray([...participantsArray]);
 
       if (voiceActivated) {
         let onStageParticipantsForClear = participantsArray.filter(
           (participant) => participant?.layout_group
         );
-        await transformLayout({
-          token: Data.current.token,
-          body: { transforms: { layout: selectedLayout } },
-        });
+        await applyTransformLayout(selectedLayout);
+
         await clearPinningConfig({
           token: Data.current.token,
         });
+        setCurrentPinValue(0);
         if (onStageParticipantsForClear.length > 0) {
           for (const participant of onStageParticipantsForClear) {
             await clearParticipantFromLayoutGroup({
@@ -144,7 +198,10 @@ function App() {
         let onStageParticipantsForCount = participantsArray.filter(
           (participant) => participant?.layout_group
         );
+        console.log("Checking value of participantsArray", onStageParticipantsForCount);
         let parNumber = onStageParticipantsForCount.length;
+        console.log("length of parNumber value ", parNumber);
+
         if (parNumber > 0) {
           let count = getParticipantsNumber(selectedLayout);
           if (parNumber > count) {
@@ -153,15 +210,19 @@ function App() {
             const errorMessage = `Please remove ${removeNumber} Presenters from the Stage to apply the ${layoutName} Layout`;
             throw new ValidationError(errorMessage);
           }
-          await setPinningConfig({
-            token: Data.current.token,
-            pinning_config: numberToWords(parNumber),
-          });
-          await transformLayout({
-            token: Data.current.token,
-            body: { transforms: { layout: selectedLayout } },
-          });
 
+          if (parNumber !== currentPinValue ) {
+            await setPinningConfig({
+              token: Data.current.token,
+              pinning_config: numberToWords(parNumber),
+            });
+            setCurrentPinValue(parNumber);
+          } else {
+            console.log("New Pin value is the same as the current Pin Value.");
+          }
+
+          await applyTransformLayout(selectedLayout);
+           console.log("Before promise all call check onStageParticipants",  onStageParticipants);
           await Promise.all(
             onStageParticipants.map((participant) =>
               setParticipantToLayoutGroup({
@@ -171,9 +232,9 @@ function App() {
               })
             )
           );
-
+          
+          console.log("Before clearParticipantFromLayoutGroup call check offScreenParticipants",  offScreenParticipants);
           if (offScreenParticipants.length > 0) {
-            // console.log("offScreenParticipants.length is more than zero", offScreenParticipants);
             for (const participant of offScreenParticipants) {
               await clearParticipantFromLayoutGroup({
                 uuid: participant.uuid,
@@ -181,11 +242,9 @@ function App() {
               });
             }
           }
+
         } else {
-          await transformLayout({
-            token: Data.current.token,
-            body: { transforms: { layout: selectedLayout } },
-          });
+          await applyTransformLayout(selectedLayout);
 
           if (offScreenParticipants.length > 0) {
             console.log(
@@ -201,6 +260,12 @@ function App() {
           }
         }
       }
+
+      setInitialParticipantsArray([...participantsArray]);
+
+      // changing Viewer Layout
+      if (mediaLayout !== null && prevMediaLayout.current !== mediaLayout)
+        LAYOUT_PANEL_VIEWER(getLayoutName(mediaLayout));
     } catch (error) {
       if (error instanceof ValidationError) {
         SHOW_VB_MSG(error.message);
@@ -217,6 +282,7 @@ function App() {
     presenterAllLayout,
     participantsArray,
     initialParticipantsArray,
+    mediaLayout,
   ]);
 
   const handlePresenterLayoutChange = (layout) => {
@@ -227,15 +293,16 @@ function App() {
     setPresenterAllLayout(layout);
     setPresenterLayout(null); // Clear the other selection
   };
-  const handleMediaLayoutChange = (layout) => {
-    setMediaLayout(layout);
-    setMediaAllLayout(null); // Clear the other selection
-  };
-  const handleMediaAllLayoutChange = (layout) => {
-    setMediaAllLayout(layout);
-    setMediaLayout(null); // Clear the other selection
-  };
 
+  
+  const handleMediaLayoutChange = (layout) => {
+    try{
+    if (mediaLayout !== null) prevMediaLayout.current = mediaLayout;
+    setMediaLayout(layout);
+  } catch(e){
+    console.log("Please select valid MediaLayout");
+  }
+  };
 
   return (
     <>
@@ -272,6 +339,7 @@ function App() {
                     roleStatus={roleStatus}
                     talkingPplArray={[]}
                     pexipBroadCastChannel={bc}
+                    currMediaLayoutIndex={mediaLayout}
                   />
                   <div id="applyBtnDiv" className="applyBtnDiv">
                     <button className="btn" onClick={handleApplyClick}>
@@ -286,6 +354,7 @@ function App() {
               element={
                 <ViewAllLayout
                   setPresenterAllLayout={handlePresenterAllLayoutChange}
+                  pexipBroadCastChannel={bc}
                 />
               }
             />
@@ -293,7 +362,9 @@ function App() {
               path="/media-all-view"
               element={
                 <ViewAllMediaLayout
-                  setMediaAllLayout={handleMediaAllLayoutChange}
+                  pexipBroadCastChannel={bc}
+                  mLayout={handleMediaLayoutChange}
+                  currMediaLayoutIndex={mediaLayout}
                 />
               }
             />
