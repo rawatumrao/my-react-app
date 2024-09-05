@@ -1,6 +1,5 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import "./mediaStyle.css";
-
 import { useNavigate } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -9,24 +8,46 @@ import {
   faAngleDown,
   faAngleRight,
 } from "@fortawesome/free-solid-svg-icons";
-import {
-  mediaHeaderImage,
-  mediaImages,
-} from "../../../constants/imageConstants";
+import defaultLayout from "../../../images/defaultLayout.png";
+import largeVideoLayout from "../../../images/largeVideoLayout.png";
+import largeContentLayout from "../../../images/largeContentLayout.png";
+import videoOnly from "../../../images/videoOnly.png";
+import contentOnly from "../../../images/contentOnly.png";
+import { EVENTS } from "../../../constants/constants";
+import { getLayoutName } from "../../../utils/layoutFuncs";
 
-const Media = ({ mLayout }) => {
-  const [expanded, setExpanded] = useState(false);
-  const [currentImageIndex, setCurrentImageIndex] = useState(0);
-  const [selectedImage, setSelectedImage] = useState(null);
+const Media = ({
+  mLayout,
+  pexipBroadCastChannel,
+  expandedStatus,
+  currMediaLayoutIndex,
+}) => {
+  const imagesSrc = [
+    defaultLayout,
+    largeVideoLayout,
+    largeContentLayout,
+    videoOnly,
+    contentOnly,
+  ];
+  const mediaImageDiv = useRef();
+  const [expanded, setExpanded] = useState(expandedStatus);
+  const [selectedImage, setSelectedImage] = useState(currMediaLayoutIndex);
   const navigate = useNavigate();
 
-  const handleImageClick = (image) => {
-    mLayout(image.host_layout);
-    setSelectedImage((prevImage) => (prevImage === image ? null : image));
-  };
+  const handleImageClick = (imageIndex) => {
+    mLayout(selectedImage === imageIndex ? null : imageIndex);
+    setSelectedImage((prevImage) =>
+      prevImage === imageIndex ? null : imageIndex
+    );
 
-  const handleDoubleClick = (image) => {
-    setSelectedImage(image);
+    let layout = getLayoutName(imageIndex);
+
+    pexipBroadCastChannel.postMessage({
+      event: EVENTS.controlRoomMediaLayout,
+      info: {
+        mediaLayout: `${layout}`,
+      },
+    });
   };
 
   const toggleExpandCollapse = () => {
@@ -34,13 +55,11 @@ const Media = ({ mLayout }) => {
   };
 
   const handleNext = () => {
-    setCurrentImageIndex((prevIndex) => (prevIndex + 1) % mediaImages.length);
+    mediaImageDiv.current.scrollLeft += 160;
   };
 
   const handlePrev = () => {
-    setCurrentImageIndex(
-      (prevIndex) => (prevIndex - 1 + mediaImages.length) % mediaImages.length
-    );
+    mediaImageDiv.current.scrollLeft -= 160;
   };
 
   const handleSeeAllClick = () => {
@@ -56,7 +75,15 @@ const Media = ({ mLayout }) => {
               <FontAwesomeIcon icon={faAngleRight} /> Media Layout
             </span>
             <span className="">
-              <img className="header-image" src={mediaHeaderImage}></img>
+              <img
+                className="header-image"
+                src={
+                  imagesSrc[selectedImage]
+                    ? imagesSrc[selectedImage]
+                    : imagesSrc[0]
+                }
+                onClick={toggleExpandCollapse}
+              ></img>
             </span>
           </>
         ) : (
@@ -77,23 +104,23 @@ const Media = ({ mLayout }) => {
             className="nav-arrow left-arrow"
             onClick={handlePrev}
           />
-          <div className="images">
-            {mediaImages
-              .slice(currentImageIndex, currentImageIndex + 7)
-              .map((image, index) => (
+          <div className="images mediaImagesDiv" ref={mediaImageDiv}>
+            {imagesSrc.map((src, index) => {
+              return (
                 <img
                   key={index}
-                  src={
-                    selectedImage?.imageUrl === image.imageUrl
-                      ? image.selectedImageUrl
-                      : image.imageUrl
+                  src={src}
+                  className={
+                    selectedImage === index
+                      ? "mediaImages selected"
+                      : "mediaImages"
                   }
-                  alt={`Image ${index + 1}`}
-                  onClick={() => handleImageClick(image)}
-                  onDoubleClick={() => handleDoubleClick(image)}
-                  className="zoom-image"
+                  alt={getLayoutName(index)}
+                  title=""
+                  onClick={() => handleImageClick(index)}
                 />
-              ))}
+              );
+            })}
           </div>
           <FontAwesomeIcon
             icon={faChevronRight}

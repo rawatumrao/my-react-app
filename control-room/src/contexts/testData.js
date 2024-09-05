@@ -88,7 +88,7 @@ export const INITIAL_PARTICIPANTS_DUMMY = [
         },
       ],
       receive_from_audio_mix: "main",
-      layout_group: null,
+      layout_group: "one",
     },
   },
   {
@@ -137,7 +137,7 @@ export const INITIAL_PARTICIPANTS_DUMMY = [
       },
     ],
     receive_from_audio_mix: "main",
-    layout_group: null,
+    layout_group: "two",
   },
   {
     api_url: "/participants/9fa2b838-c4e9-4c5a-813a-0ee7b44b1441",
@@ -185,7 +185,7 @@ export const INITIAL_PARTICIPANTS_DUMMY = [
       },
     ],
     receive_from_audio_mix: "main",
-    layout_group: null,
+    layout_group: "three",
   },
 
   {
@@ -233,7 +233,7 @@ export const INITIAL_PARTICIPANTS_DUMMY = [
       },
     ],
     receive_from_audio_mix: "main",
-    layout_group: null,
+    layout_group: "four",
   },
   {
     api_url: "/participants/34981533-01ed-45a3-a586-4f86e8d59310",
@@ -280,7 +280,7 @@ export const INITIAL_PARTICIPANTS_DUMMY = [
       },
     ],
     receive_from_audio_mix: "main",
-    layout_group: null,
+    layout_group: "five",
   },
   {
     api_url: "/participants/4addf56c-2dbe-4303-8912-7b1355a7c322",
@@ -327,7 +327,7 @@ export const INITIAL_PARTICIPANTS_DUMMY = [
       },
     ],
     receive_from_audio_mix: "main",
-    layout_group: null,
+    layout_group: "six",
   },
   {
     api_url: "/participants/48f0321b-4010-4a9e-9d14-50f23627929e",

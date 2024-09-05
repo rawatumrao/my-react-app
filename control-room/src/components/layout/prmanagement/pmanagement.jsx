@@ -13,7 +13,11 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 //import { clearPinningConfig } from "../../../utils/fetchRequests.js";
 import { AppContext } from "../../../contexts/context.js";
-import { ALT_TAGS } from "../../../constants/constants.js";
+import {
+  EVENTS,
+  ALT_TAGS,
+  CONTROL_ROOM_VOICE_ACTIVATED,
+} from "../../../constants/constants.js";
 
 const PManagement = ({
   participantsArray,
@@ -25,12 +29,18 @@ const PManagement = ({
   layoutSize,
 }) => {
   const { setVoiceActivated } = useContext(AppContext);
-  const [checked, setChecked] = useState(false);
+  const [checked, setChecked] = useState(CONTROL_ROOM_VOICE_ACTIVATED);
   const [expanded, setExpanded] = useState(true);
 
   const handleChange = () => {
-    setChecked(!checked);
-    setVoiceActivated(!checked);
+    let checkedStatus = !checked;
+    setChecked(checkedStatus);
+    setVoiceActivated(checkedStatus);
+
+    pexipBroadCastChannel.postMessage({
+      event: EVENTS.controlRoomVoiceActivated,
+      info: checkedStatus,
+    });
   };
 
   const toggleExpandCollapse = () => {

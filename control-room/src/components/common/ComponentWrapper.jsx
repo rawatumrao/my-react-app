@@ -3,6 +3,7 @@ import Presenter from "../layout/presenter/presenter.jsx";
 import PManagement from "../layout/prmanagement/pmanagement.jsx";
 import Media from "../layout/media/media.jsx";
 import { getTotalCapacity } from "../../constants/imageConstants.js";
+import { MAX_PARTICIPANTS } from "../../constants/constants.js";
 
 const ComponentWrapper = ({
   participantsArray,
@@ -14,9 +15,11 @@ const ComponentWrapper = ({
   roleStatus,
   talkingPplArray,
   pexipBroadCastChannel,
+  currMediaLayoutIndex,
+  presenterLayout,
 }) => {
-  const [layoutSize, setLayoutSize] = useState(20);
-  const [selectedLayout, setSelectedLayout] = useState(null);
+  const [layoutSize, setLayoutSize] = useState(MAX_PARTICIPANTS);
+  const [selectedLayout, setSelectedLayout] = useState(presenterLayout);
 
   useEffect(() => {
     if (selectedLayout) {
@@ -27,8 +30,18 @@ const ComponentWrapper = ({
 
   return (
     <>
-      <Presenter pLayout={pLayout} setSelectedLayout={setSelectedLayout} />
-      <Media mLayout={mLayout} />
+      <Presenter
+        pLayout={pLayout}
+        setSelectedLayout={setSelectedLayout}
+        pexipBroadCastChannel={pexipBroadCastChannel}
+        presenterLayout={presenterLayout}
+      />
+      <Media
+        mLayout={mLayout}
+        pexipBroadCastChannel={pexipBroadCastChannel}
+        expandedStatus={false}
+        currMediaLayoutIndex={currMediaLayoutIndex}
+      />
       <PManagement
         participantsArray={participantsArray}
         setParticipantsArray={setParticipantsArray}

@@ -1,54 +1,31 @@
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import "../media/mediaStyle.css";
 import "./viewallmedialayoutStyle.css";
+import Media from "../media/media";
+import { useNavigate } from "react-router-dom";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faAngleLeft } from "@fortawesome/free-solid-svg-icons";
 
-import { mediaImages } from "../../../constants/imageConstants.js";
-
-const ViewAllMediaLayout = ({ setMediaAllLayout }) => {
-  const [selectedMediaImage, setSelectedMediaImage] = useState(null);
+const ViewAllMediaLayout = ({
+  mLayout,
+  pexipBroadCastChannel,
+  currMediaLayoutIndex,
+}) => {
   const navigate = useNavigate();
 
   const handleBackClick = () => {
     navigate("/");
   };
 
-  const handleMediaImageClick = (image) => {
-    setMediaAllLayout(image.layout);
-    setSelectedMediaImage((prevImage) => (prevImage === image ? null : image));
-  };
-
-  const handleMediaImageDoubleClick = (image) => {
-    setSelectedMediaImage(image);
-  };
-
   return (
-    <div className="view-media-all-layout">
+    <div className="viewAllMediaLayout">
       <span className="link-text" onClick={handleBackClick}>
-        &lt; Back
+        <FontAwesomeIcon icon={faAngleLeft} /> Back
       </span>
-      <div className="layouts">
-        <span className="text-style"> Media Layouts</span>
-        <div className="gridContainer">
-          {mediaImages.map((image, index) => (
-            <div key={index} className="box">
-              <img
-                src={
-                  selectedMediaImage?.imageUrl === image.imageUrl
-                    ? image.selectedImageUrl
-                    : image.imageUrl
-                }
-                alt={`Media Image ${index + 1}`}
-                className={`image ${
-                  selectedMediaImage === image.layout ? "selected" : ""
-                }`}
-                onClick={() => handleMediaImageClick(image)}
-                onDoubleClick={() => handleMediaImageDoubleClick(image)}
-              />
-            </div>
-          ))}
-        </div>
-      </div>
+      <Media
+        mLayout={mLayout}
+        pexipBroadCastChannel={pexipBroadCastChannel}
+        expandedStatus={true}
+        currMediaLayoutIndex={currMediaLayoutIndex}
+      />
     </div>
   );
 };

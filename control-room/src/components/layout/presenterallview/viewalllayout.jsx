@@ -3,9 +3,14 @@ import { useNavigate } from "react-router-dom";
 import "../media/mediaStyle.css";
 import "./viewalllayoutStyle.css";
 import { images } from "../../../constants/imageConstants.js";
+import { EVENTS } from "../../../constants/constants.js";
 
-const ViewAllLayout = ({ setPresenterAllLayout }) => {
-  const [selectedImage, setSelectedImage] = useState(null);
+const ViewAllLayout = ({
+  setPresenterAllLayout,
+  pexipBroadCastChannel,
+  presenterLayout,
+}) => {
+  const [selectedImage, setSelectedImage] = useState(presenterLayout);
   const navigate = useNavigate();
 
   const handleBackClick = () => {
@@ -15,6 +20,11 @@ const ViewAllLayout = ({ setPresenterAllLayout }) => {
   const handleImageClick = (image) => {
     setPresenterAllLayout(image.layout);
     setSelectedImage((prevImage) => (prevImage === image ? null : image));
+
+    pexipBroadCastChannel.postMessage({
+      event: EVENTS.controlRoomPresenterLayout,
+      info: JSON.parse(JSON.stringify(image.layout)),
+    });
   };
 
   const handleDoubleClick = (image) => {

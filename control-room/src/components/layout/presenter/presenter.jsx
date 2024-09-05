@@ -1,7 +1,6 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import "../media/mediaStyle.css";
 import { images, headerImage } from "../../../constants/imageConstants.js";
-
 import { useNavigate } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -10,11 +9,23 @@ import {
   faAngleDown,
   faAngleRight,
 } from "@fortawesome/free-solid-svg-icons";
+import {
+  EVENTS,
+  CONTROL_ROOM_PRESENTER_LAYOUT,
+} from "../../../constants/constants.js";
 
-const Presenter = ({ pLayout, setSelectedLayout }) => {
+const Presenter = ({
+  pLayout,
+  setSelectedLayout,
+  pexipBroadCastChannel,
+  presenterLayout,
+}) => {
   const [expanded, setExpanded] = useState(false);
-  const [currentImageIndex, setCurrentImageIndex] = useState(0);
-  const [selectedImage, setSelectedImage] = useState(null);
+  const [selectedImage, setSelectedImage] = useState(
+    CONTROL_ROOM_PRESENTER_LAYOUT
+  );
+
+  const imageContainerRef = useRef(null);
 
   const navigate = useNavigate();
 
@@ -22,6 +33,11 @@ const Presenter = ({ pLayout, setSelectedLayout }) => {
     pLayout(image.layout);
     setSelectedLayout(image.layout);
     setSelectedImage((prevImage) => (prevImage === image ? null : image));
+
+    pexipBroadCastChannel.postMessage({
+      event: EVENTS.controlRoomPresenterLayout,
+      info: JSON.parse(JSON.stringify(image.layout)),
+    });
   };
 
   const handleDoubleClick = (image) => {
@@ -32,14 +48,23 @@ const Presenter = ({ pLayout, setSelectedLayout }) => {
     setExpanded(!expanded);
   };
 
+  //Scrolling fuctions
   const handleNext = () => {
-    setCurrentImageIndex((prevIndex) => (prevIndex + 1) % images.length);
+    if (imageContainerRef.current) {
+      imageContainerRef.current.scrollBy({
+        left: 160,
+        behaviot: "smooth",
+      });
+    }
   };
 
   const handlePrev = () => {
-    setCurrentImageIndex(
-      (prevIndex) => (prevIndex - 1 + images.length) % images.length
-    );
+    if (imageContainerRef.current) {
+      imageContainerRef.current.scrollBy({
+        left: -160,
+        behaviot: "smooth",
+      });
+    }
   };
 
   const handleSeeAllClick = () => {
@@ -57,8 +82,15 @@ const Presenter = ({ pLayout, setSelectedLayout }) => {
             <span className="expand-button" onClick={toggleExpandCollapse}>
               <FontAwesomeIcon icon={faAngleRight} /> Presenter Layout
             </span>
-            <span className="">
-              <img className="header-image" src={headerImage}></img>
+            <span className="" onClick={toggleExpandCollapse}>
+              <img
+                className="header-image"
+                src={
+                  sortedImages.find((item) => {
+                    if (item.layout === presenterLayout) return item;
+                  }).imageUrl
+                }
+              ></img>
             </span>
           </>
         ) : (
@@ -79,23 +111,21 @@ const Presenter = ({ pLayout, setSelectedLayout }) => {
             className="nav-arrow left-arrow"
             onClick={handlePrev}
           />
-          <div className="images">
-            {sortedImages
-              .slice(currentImageIndex, currentImageIndex + 7)
-              .map((image, index) => (
-                <img
-                  key={index}
-                  src={
-                    selectedImage?.imageUrl === image.imageUrl
-                      ? image.selectedImageUrl
-                      : image.imageUrl
-                  }
-                  alt={`Image ${index + 1}`}
-                  onClick={() => handleImageClick(image)}
-                  onDoubleClick={() => handleDoubleClick(image)}
-                  className="zoom-image"
-                />
-              ))}
+          <div className="images" ref={imageContainerRef}>
+            {sortedImages.map((image, index) => (
+              <img
+                key={index}
+                src={
+                  selectedImage?.imageUrl === image.imageUrl
+                    ? image.selectedImageUrl
+                    : image.imageUrl
+                }
+                alt={`Image ${index + 1}`}
+                onClick={() => handleImageClick(image)}
+                onDoubleClick={() => handleDoubleClick(image)}
+                className="zoom-image"
+              />
+            ))}
           </div>
           <FontAwesomeIcon
             icon={faChevronRight}

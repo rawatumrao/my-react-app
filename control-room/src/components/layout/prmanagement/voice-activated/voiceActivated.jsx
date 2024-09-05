@@ -2,7 +2,6 @@ import { useState, useEffect } from "react";
 import { PropTypes } from "prop-types";
 import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-
 import {
   faPlus,
   faTimes,
@@ -10,24 +9,17 @@ import {
   faAngleRight,
 } from "@fortawesome/free-solid-svg-icons";
 import "./voiceActivatedStyle.css";
-import { HEADERS, EVENTS, BUTTON_NAMES, ENV, ENVIRONMENT, WAIT_TO_JOIN_ORDER, PRESENTER_ORDER, STREAMS_ORDER, SHOW_VB_MSG, LABEL_NAMES, MAX_PARTICIPANTS } from "../../../../constants/constants";
+import {
+  EVENTS,
+  BUTTON_NAMES,
+  CONTROL_ROOM_ON_STAGE,
+  CONTROL_ROOM_OFF_SCREEN,
+  LABEL_NAMES,
+  SHOW_VB_MSG,
+} from "../../../../constants/constants";
 import { layoutGroupValue } from "../../../../constants/imageConstants";
 import ParticipantsListBtn from "../../../utility/ParticipantsListBtn/ParticipantsListBtn";
 import ParticipantsListDisplayName from "../../../utility/ParticipantsListDisplayName/ParticipantsListDisplayName";
-
-
-const setInitialOrder = (header, participantsArray) => {
-  if (ENV === ENVIRONMENT.prod) {
-    let orderedlist = [];
-    if (header === HEADERS.waitingToJoin) orderedlist = WAIT_TO_JOIN_ORDER;
-    if (header === HEADERS.presenters) orderedlist = PRESENTER_ORDER;
-    if (header === HEADERS.streams) orderedlist = STREAMS_ORDER;
-
-    return orderedlist?.length ? orderedlist : participantsArray;
-  } else {
-    return participantsArray;
-  }
-};
 
 const numberToWords = (num) => {
   return layoutGroupValue[num - 1] || "unknown";
@@ -42,80 +34,100 @@ const VoiceActivated = ({
   pexipBroadCastChannel,
   layoutSize,
 }) => {
-  const [onStageItems, setOnStageItems] = useState([]);
-  const [offScreenItems, setOffScreenItems] = useState([]);
+  const [onStageItems, setOnStageItems] = useState(CONTROL_ROOM_ON_STAGE);
+  const [offScreenItems, setOffScreenItems] = useState(CONTROL_ROOM_OFF_SCREEN);
   const [data, setData] = useState(participantsArray);
   const [onStageOpen, setOnStageOpen] = useState(true);
   const [offScreenOpen, setOffScreenOpen] = useState(true);
-  const [listOrderArray, setListOrderArray] = useState(
-    setInitialOrder(header, participantsArray)
-  );
-
-  useEffect(()=>{
-    console.log("Participants Array updated:  ", participantsArray);
-    setData(participantsArray);
-
-  },[participantsArray]);
 
   useEffect(() => {
+    if (onStageItems.length || offScreenItems.length)
+      loadItems([...onStageItems, ...offScreenItems], false);
+  }, []);
 
-        let filteredList = [];
-    let copyOfparticipantsArray = [...participantsArray];
+  useEffect(() => {
+    loadItems(data, false);
+  }, [data]);
 
-    // keep order of list
-    listOrderArray.forEach((item) => {
-      if (participantsArray.find((elem) => elem.uuid === item.uuid)) {
-        copyOfparticipantsArray = copyOfparticipantsArray.filter((person) => {
-          if (person.uuid === item.uuid) filteredList.push(person);
-          return person.uuid !== item.uuid;
+  useEffect(() => {
+    loadItems(participantsArray, true);
+  }, [participantsArray]);
+
+  const loadItems = (pplArr, participantsArrayUpdatedBool) => {
+    try {
+      // added the layout_groups to the new participant update only
+      if (participantsArrayUpdatedBool) {
+        pplArr.forEach((item) => {
+          data.find((elem) => {
+            if (elem.uuid === item.uuid) item.layout_group = elem.layout_group;
+          });
         });
       }
-    });
 
-    // add new ppl to the ordered list at the bottom
-    copyOfparticipantsArray.forEach((item) => {
-      filteredList.push(item);
-    });
+      const onStage = pplArr.filter(
+        (item) =>
+          item.layout_group !== null &&
+          item.protocol !== "api" &&
+          item.protocol !== "rtmp"
+      );
 
-    setListOrderArray(filteredList);
+      const offScreen = pplArr.filter(
+        (item) =>
+          item.layout_group === null &&
+          item.protocol !== "api" &&
+          item.protocol !== "rtmp"
+      );
 
-    // if you add more than the max participants give this message
-    if (
-      participantsArray.length !== listOrderArray.length &&
-      participantsArray.length > MAX_PARTICIPANTS &&
-      header === HEADERS.presenters
-    )
-      SHOW_VB_MSG(LABEL_NAMES.tooManyPresenters);
+      let updatedOnStageItems = [...onStage];
+      let updatedOffScreenItems = [...offScreen];
 
-    
-    const loadItems = () => {
-      try {
-        const onStage = data.filter(
-          (item) =>
-            item.layout_group !== "" &&
-            item.layout_group !== null &&
-            item.protocol !== "api" &&
-            item.protocol !== "rtmp"
-        );
+      // order List
+      if (onStageItems.length) {
+        updatedOnStageItems = [];
 
-        const offScreen = data.filter(
-          (item) =>
-            (item.layout_group === "" || item.layout_group === null) &&
-            item.protocol !== "api" &&
-            item.protocol !== "rtmp"
-        );
-
-        setOnStageItems(onStage);
-        setOffScreenItems(offScreen);
-      } catch (error) {
-        console.error("Error processing data: ", error.message);
+        onStageItems.forEach((item) => {
+          onStage.find((elem) => {
+            if (elem.uuid === item.uuid) {
+              updatedOnStageItems.push(elem);
+            }
+          });
+        });
       }
-    };
-    loadItems();
-  }, [data, participantsArray, header, listOrderArray]);
+
+      if (offScreenItems.length) {
+        updatedOffScreenItems = [];
+
+        offScreenItems.forEach((item) => {
+          offScreen.find((elem) => {
+            if (elem.uuid === item.uuid) {
+              updatedOffScreenItems.push(elem);
+            }
+          });
+        });
+
+        // add the new participants to off screen
+        if (updatedOffScreenItems.length !== offScreen.length) {
+          for (let x = updatedOffScreenItems.length; x < offScreen.length; x++)
+            updatedOffScreenItems.push(offScreen[x]);
+        }
+      }
+
+      setOnStageItems(updatedOnStageItems);
+      setOffScreenItems(updatedOffScreenItems);
+
+      pexipBroadCastChannel.postMessage({
+        event: EVENTS.controlRoomStageOrders,
+        info: {
+          onStage: onStage,
+          offScreen: offScreen,
+        },
+      });
+    } catch (error) {
+      console.error("Error processing data: ", error.message);
+    }
+  };
 
   const updateLayoutGroups = (destList) =>
-    //console.log("Called updateLayoutGroups for onStage");
     destList.map((item, index) => {
       const newLayout_group = numberToWords(index + 1);
 
@@ -131,7 +143,6 @@ const VoiceActivated = ({
     if (!destination) {
       return;
     }
-
     let updatedOnStageItems = [...onStageItems];
     let updatedOffScreenItems = [...offScreenItems];
 
@@ -146,28 +157,31 @@ const VoiceActivated = ({
 
     const [movedItem] = sourceList.splice(source.index, 1);
 
-   
-
     destList.splice(destination.index, 0, movedItem);
 
-   
     if (destination.droppableId === "onStage") {
+      // Prevent adding more items to onStage if the limit is reache
+      if (
+        destination.droppableId === "onStage" &&
+        destList.length > layoutSize
+      ) {
+        console.log("Cannot add more participants to onStage. Limit reached.");
+        const errorMessage = `${LABEL_NAMES.blockParticipantOverMaxCount1} ${layoutSize} ${LABEL_NAMES.blockParticipantOverMaxCount2}`;
+        SHOW_VB_MSG(errorMessage);
+        return;
+      }
+
       updatedOnStageItems = updateLayoutGroups(destList);
-     
       setOnStageItems(updatedOnStageItems);
-    
     } else {
-     
       updatedOffScreenItems = destList.map((item) => ({
         ...item,
-        layout_group: "",
+        layout_group: null,
       }));
 
       setOffScreenItems(updatedOffScreenItems);
-    
     }
 
-    
     const undatedOnStageAfterRemoval = updateLayoutGroups(updatedOnStageItems);
     setOnStageItems(undatedOnStageAfterRemoval);
 
@@ -177,19 +191,7 @@ const VoiceActivated = ({
     ];
 
     setData(updatedData);
-    setParticipantsArray(updatedData); 
-    let listName = "";
-    if (header === HEADERS.waitingToJoin) listName = HEADERS.waitingToJoin;
-    if (header === HEADERS.presenters) listName = HEADERS.presenters;
-    if (header === HEADERS.streams) listName = HEADERS.streams;
-if(pexipBroadCastChannel){
-    pexipBroadCastChannel.postMessage({
-      event: EVENTS.orderedList,
-      info: JSON.parse(JSON.stringify(updatedData)),
-      orderedListName: HEADERS.presenters,
-    });
-    console.log("Broadcasted updated data: ", updatedData);
-  }
+    setParticipantsArray(updatedData);
   };
 
   const moveToOnStage = (item) => {
@@ -200,57 +202,33 @@ if(pexipBroadCastChannel){
       ...onStageItems,
       { ...item, layout_group: numberToWords(onStageItems.length + 1) },
     ];
+
+    if (updatedOnStageItems.length > layoutSize) {
+      console.log("Cannot add more participants to onStage. Limit reached.");
+      const errorMessage = `${LABEL_NAMES.blockParticipantOverMaxCount1} ${layoutSize} ${LABEL_NAMES.blockParticipantOverMaxCount2}`;
+      SHOW_VB_MSG(errorMessage);
+      return;
+    }
+
     setOnStageItems(updateLayoutGroups(updatedOnStageItems));
     setOffScreenItems(updatedOffScreenItems);
-    const updatedData = [
-      ...updatedOnStageItems,
-      ...updatedOffScreenItems,
-    ];
+    const updatedData = [...updatedOnStageItems, ...updatedOffScreenItems];
 
     setData(updatedData);
-    setParticipantsArray(updatedData); 
-    let listName = "";
-    if (header === HEADERS.waitingToJoin) listName = HEADERS.waitingToJoin;
-    if (header === HEADERS.presenters) listName = HEADERS.presenters;
-    if (header === HEADERS.streams) listName = HEADERS.streams;
-
-    if(pexipBroadCastChannel){
-      pexipBroadCastChannel.postMessage({
-        event: EVENTS.orderedList,
-        info: JSON.parse(JSON.stringify(updatedData)),
-        orderedListName: HEADERS.presenters,
-      });
-      console.log("Broadcasted updated data: ", updatedData);
-    }
+    setParticipantsArray(updatedData);
   };
   const movedToOffScreen = (item) => {
     const updatedOnStageItems = onStageItems.filter((i) => i.uuid != item.uuid);
     const updatedOffScreenItems = [
       ...offScreenItems,
-      { ...item, layout_group: "" },
+      { ...item, layout_group: null },
     ];
     setOnStageItems(updateLayoutGroups(updatedOnStageItems));
     setOffScreenItems(updatedOffScreenItems);
-    const updatedData = [
-      ...updatedOnStageItems,
-      ...updatedOffScreenItems,
-    ];
+    const updatedData = [...updatedOnStageItems, ...updatedOffScreenItems];
 
     setData(updatedData);
-    setParticipantsArray(updatedData); 
-    let listName = "";
-    if (header === HEADERS.waitingToJoin) listName = HEADERS.waitingToJoin;
-    if (header === HEADERS.presenters) listName = HEADERS.presenters;
-    if (header === HEADERS.streams) listName = HEADERS.streams;
-
-    if(pexipBroadCastChannel){
-      pexipBroadCastChannel.postMessage({
-        event: EVENTS.orderedList,
-        info: JSON.parse(JSON.stringify(updatedData)),
-        orderedListName: HEADERS.presenters,
-      });
-      console.log("Broadcasted updated data: ", updatedData);
-    }
+    setParticipantsArray(updatedData);
   };
 
   const draggingStyles = (

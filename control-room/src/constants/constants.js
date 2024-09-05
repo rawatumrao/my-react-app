@@ -1,11 +1,12 @@
 import { INITIAL_PARTICIPANTS_DUMMY } from "../contexts/testData";
+import { getLayoutIndex } from "../utils/layoutFuncs";
 
 export const ENVIRONMENT = {
   prod: "prod",
   dev: "dev",
 };
 
-export const ENV = ENVIRONMENT.prod;
+export const ENV = ENVIRONMENT.dev;
 
 // parent page vars
 const pexipDataJsonVar = parent?.parent?.pexipDataJson;
@@ -52,12 +53,8 @@ export const STREAMS_ORDER = pexipDataJsonVar?.streamsOrder
   ? pexipDataJsonVar?.streamsOrder
   : [];
 export const ROLE_STATUS = ENV === ENVIRONMENT.dev ? true : false;
-export const LAYOUT_PANEL_VIEWER = (layout) => {
-  ENV === ENVIRONMENT.dev
-    ? console.log(layout)
-    : pexipDataJsonVar?.changeViewerLayout(layout);
-};
 
+// CONTROL ROOM ONLY
 export const LAYOUTS = {
   LAYOUT_DEFAULT_VIDEO: "LAYOUT_DEFAULT_VIDEO",
   LAYOUT_VIDEO_LARGE: "LAYOUT_VIDEO_LARGE",
@@ -65,6 +62,29 @@ export const LAYOUTS = {
   LAYOUT_VIDEO_ONLY: "LAYOUT_VIDEO_ONLY",
   LAYOUT_SLIDE_ONLY: "LAYOUT_SLIDE_ONLY",
 };
+
+export const LAYOUT_PANEL_VIEWER = (layout) => {
+  ENV === ENVIRONMENT.dev
+    ? console.log(layout)
+    : pexipDataJsonVar?.changeViewerLayout(layout);
+};
+export const CONTROL_ROOM_PRESENTER_LAYOUT =
+  ENV === ENVIRONMENT.dev
+    ? "1:0"
+    : pexipDataJsonVar?.controlRoomData?.presenterLayout;
+export const CONTROL_ROOM_MEDIA_LAYOUT =
+  ENV === ENVIRONMENT.dev
+    ? 0
+    : getLayoutIndex(pexipDataJsonVar?.controlRoomData?.mediaLayout);
+export const CONTROL_ROOM_VOICE_ACTIVATED =
+  ENV === ENVIRONMENT.dev
+    ? null
+    : pexipDataJsonVar?.controlRoomData?.voiceActivated;
+export const CONTROL_ROOM_ON_STAGE =
+  ENV === ENVIRONMENT.dev ? [] : pexipDataJsonVar?.controlRoomData?.onStage;
+export const CONTROL_ROOM_OFF_SCREEN =
+  ENV === ENVIRONMENT.dev ? [] : pexipDataJsonVar?.controlRoomData?.offScreen;
+// END OF CONTROL ROOM ONLY
 
 export const EVENTS = {
   token_refresh: "token_refresh",
@@ -86,6 +106,12 @@ export const EVENTS = {
   conferenceStatus: "conferenceStatus",
   orderedList: "orderedList",
   sendMsg: "sendMsg",
+  // CONTROL ROOM ONLY
+  controlRoomVoiceActivated: "controlRoomVoiceActivated",
+  controlRoomStageOrders: "controlRoomStageOrders",
+  controlRoomMediaLayout: "controlRoomMediaLayout",
+  controlRoomPresenterLayout: "controlRoomPresenterLayout",
+  controlRoomRefresh: "controlRoomRefresh",
 };
 
 export const API_CALLS = {
@@ -192,6 +218,9 @@ export const LABEL_NAMES = {
     "A host has stopped your video. Your camera is still connected.",
   unMuteLocalVideoMsg:
     "A host has requested to turn your video on. Please make sure your camera is unmuted.",
+  // CONTROL ROOM ONLY
+  blockParticipantOverMaxCount1: "You are not allowed to have more than",
+  blockParticipantOverMaxCount2: "max participants in the conference.",
 };
 
 export const PROTOCOLS = {
