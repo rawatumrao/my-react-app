@@ -1,9 +1,12 @@
-import { useState } from "react";
+import { useState, useContext } from "react";
+import { AppContext } from "../../../contexts/context";
 import { useNavigate } from "react-router-dom";
 import "../media/mediaStyle.css";
 import "./viewalllayoutStyle.css";
 import { images } from "../../../constants/imageConstants.js";
 import { EVENTS } from "../../../constants/constants.js";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faAngleLeft } from "@fortawesome/free-solid-svg-icons";
 
 const ViewAllLayout = ({
   setPresenterAllLayout,
@@ -11,6 +14,8 @@ const ViewAllLayout = ({
   presenterLayout,
 }) => {
   const [selectedImage, setSelectedImage] = useState(presenterLayout);
+  const { showRefresh, setShowRefresh, updatedShowRefreshVar } =
+    useContext(AppContext);
   const navigate = useNavigate();
 
   const handleBackClick = () => {
@@ -25,6 +30,11 @@ const ViewAllLayout = ({
       event: EVENTS.controlRoomPresenterLayout,
       info: JSON.parse(JSON.stringify(image.layout)),
     });
+
+    if (showRefresh === false) {
+      setShowRefresh(true);
+      updatedShowRefreshVar(true);
+    }
   };
 
   const handleDoubleClick = (image) => {
@@ -43,7 +53,7 @@ const ViewAllLayout = ({
   return (
     <div className="view-all-layout">
       <span className="link-text" onClick={handleBackClick}>
-        &lt; Back
+        <FontAwesomeIcon icon={faAngleLeft} /> Back
       </span>
       <div className="layouts">
         <div>

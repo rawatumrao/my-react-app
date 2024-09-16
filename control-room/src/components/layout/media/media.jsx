@@ -1,4 +1,5 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useContext } from "react";
+import { AppContext } from "../../../contexts/context";
 import "./mediaStyle.css";
 import { useNavigate } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -32,6 +33,8 @@ const Media = ({
   const mediaImageDiv = useRef();
   const [expanded, setExpanded] = useState(expandedStatus);
   const [selectedImage, setSelectedImage] = useState(currMediaLayoutIndex);
+  const { setShowRefresh, showRefresh, updatedShowRefreshVar } =
+    useContext(AppContext);
   const navigate = useNavigate();
 
   const handleImageClick = (imageIndex) => {
@@ -48,6 +51,11 @@ const Media = ({
         mediaLayout: `${layout}`,
       },
     });
+
+    if (showRefresh === false) {
+      setShowRefresh(true);
+      updatedShowRefreshVar(true);
+    }
   };
 
   const toggleExpandCollapse = () => {

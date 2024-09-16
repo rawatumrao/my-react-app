@@ -18,6 +18,10 @@ import {
   CONTROL_ROOM_MEDIA_LAYOUT,
   CONTROL_ROOM_VOICE_ACTIVATED,
   LAYOUT_PANEL_VIEWER,
+  CONTROL_ROOM_SHOW_REFRESH,
+  CONTROL_ROOM_ON_STAGE,
+  CONTROL_ROOM_OFF_SCREEN,
+  CONTROL_ROOM_IS_LOADED,
 } from "./constants/constants.js";
 import { AppContext } from "././contexts/context";
 import { createData } from "././utils/processJsonData";
@@ -29,6 +33,7 @@ import {
   clearParticipantFromLayoutGroup,
   clearPinningConfig,
   setPinningConfig,
+  participantSpotlightOff,
 } from "./services/fetchRequests.js";
 import {
   getParticipantsNumber,
@@ -38,6 +43,8 @@ import {
 import { findRoleOfUser, sortParticipants } from "./utils/categorizeFuncs.js";
 import ViewAllMediaLayout from "./components/layout/mediaallview/viewallmeidalayout.jsx";
 import { getLayoutName } from "./utils/layoutFuncs.js";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faCircleNotch } from "@fortawesome/pro-light-svg-icons";
 
 const bc = new BroadcastChannel("pexip");
 
@@ -56,10 +63,13 @@ function App() {
     createData(INITIAL_PARTICIPANT)
   );
   const [roleStatus, setRoleStatus] = useState(ROLE_STATUS);
-  const [initialParticipantsArray, setInitialParticipantsArray] =
-    useState(null);
+  const [initialParticipantsArray, setInitialParticipantsArray] = useState(
+    () => [...CONTROL_ROOM_ON_STAGE, ...CONTROL_ROOM_OFF_SCREEN]
+  );
   const [currentLayout, setCurentlayout] = useState(null);
-  const [currentPinValue, setCurrentPinValue] = useState(null);
+  const [currentPinValue, setCurrentPinValue] = useState(0);
+  const [isLoaded, setIsLoaded] = useState(CONTROL_ROOM_IS_LOADED);
+  const [showRefresh, setShowRefresh] = useState(CONTROL_ROOM_SHOW_REFRESH);
   const Data = useRef({ token: INITIAL_TOKEN });
   const prevMediaLayout = useRef();
 
@@ -93,6 +103,11 @@ function App() {
           })
           .catch((error) => console.error(error));
       }
+
+      // turn off loading screen after 5 seconds if not already loaded
+      setTimeout(() => {
+        if (isLoaded === false) setIsLoaded(true);
+      }, 5000);
     }
     // get server sent events on pexip broadcast channel
     bc.onmessage = (msg) => {
@@ -106,12 +121,21 @@ function App() {
         Data.current.meRole = findRoleOfUser(updatedData);
         setParticipantsArray(updatedData);
         // console.log(msg.data.info.participants);
+      } else if (msg.data.event === EVENTS.conntrolRoomisLoaded) {
+        setIsLoaded(true);
       }
     };
   }, []);
 
   // Setting up presenter and media layout by clicking on apply button
   const handleApplyClick = useCallback(async () => {
+    if (ENV === ENVIRONMENT.dev) {
+      if (showRefresh) {
+        setShowRefresh(false);
+        return;
+      }
+    }
+
     try {
       let selectedLayout =
         presenterAllLayout !== null ? presenterAllLayout : presenterLayout;
@@ -124,7 +148,7 @@ function App() {
       let onStageParticipantsWithLGupdated = [];
       let offScreenParticipantsWithLGupdated = [];
 
-      if (initialParticipantsArray) {
+      if (initialParticipantsArray && initialParticipantsArray.length > 0) {
         onStageParticipantsWithLGupdated = participantsArray.filter(
           (participant) => {
             const participantWithOldDetails = initialParticipantsArray.find(
@@ -144,7 +168,6 @@ function App() {
             const participantWithOldDetails = initialParticipantsArray.find(
               (p) => p.uuid === participant.uuid
             );
-
             return (
               participant &&
               participant.layout_group === null &&
@@ -171,7 +194,7 @@ function App() {
           await clearPinningConfig({
             token: Data.current.token,
           });
-          setCurrentPinValue(null);
+          setCurrentPinValue(0);
         }
 
         if (totalParticipants_onStage.length > 0) {
@@ -181,8 +204,15 @@ function App() {
               token: Data.current.token,
             });
           }
-          setInitialParticipantsArray(null);
+          bc.postMessage({
+            event: EVENTS.controlRoomApply,
+            info: {
+              onStage: [],
+              offScreen: participantsArray,
+            },
+          });
         }
+        // turnOffSpotlights();
       } else {
         if (selectedLayout === "ac") {
           const errorMessage =
@@ -238,6 +268,14 @@ function App() {
         } else {
           await applyTransformLayout(selectedLayout);
 
+          if (parNumber == 0) {
+            await setPinningConfig({
+              token: Data.current.token,
+              pinning_config: "blank",
+            });
+            setCurrentPinValue("blank");
+          }
+
           if (offScreenParticipantsWithLGupdated.length > 0) {
             for (const participant of offScreenParticipantsWithLGupdated) {
               await clearParticipantFromLayoutGroup({
@@ -248,11 +286,29 @@ function App() {
           }
         }
         setInitialParticipantsArray([...participantsArray]);
+        turnOffSpotlights();
       }
 
       // changing Viewer Layout
-      if (mediaLayout !== null && prevMediaLayout.current !== mediaLayout)
-        LAYOUT_PANEL_VIEWER(getLayoutName(mediaLayout));
+      if (mediaLayout !== null && prevMediaLayout.current !== mediaLayout) {
+        try {
+          LAYOUT_PANEL_VIEWER(getLayoutName(mediaLayout));
+        } catch (e) {
+          console.log("Error while setting up LAYOUT_PANEL_VIEWER: ", e);
+        }
+      }
+
+      // updated default variables videobridge.jsp
+      bc.postMessage({
+        event: EVENTS.controlRoomApply,
+        info: {
+          voiceActivated: voiceActivated,
+          presenterLayout: presenterLayout,
+          showRefresh: false,
+        },
+      });
+
+      if (showRefresh) setShowRefresh(false);
     } catch (error) {
       if (error instanceof ValidationError) {
         SHOW_VB_MSG(error.message);
@@ -290,6 +346,26 @@ function App() {
     }
   };
 
+  const updatedShowRefreshVar = () => {
+    bc.postMessage({
+      event: EVENTS.controlRoomShowRefresh,
+      info: {
+        showRefresh: true,
+      },
+    });
+  };
+
+  const turnOffSpotlights = () => {
+    participantsArray.forEach((item) => {
+      if (item.spotlightOrder) {
+        participantSpotlightOff({
+          token: Data.current.token,
+          uuid: item.uuid,
+        });
+      }
+    });
+  };
+
   return (
     <>
       <AppContext.Provider
@@ -303,6 +379,9 @@ function App() {
           voiceActivated,
           setVoiceActivated,
           Data,
+          showRefresh,
+          setShowRefresh,
+          updatedShowRefreshVar,
         }}
       >
         <Router>
@@ -310,31 +389,31 @@ function App() {
             <Route
               path="/"
               element={
-                <>
-                  <ComponentWrapper
-                    participantsArray={sortParticipants(
-                      participantsArray,
-                      PARTICIPANTS_LIST_PROTOCOLS,
-                      roleStatus,
-                      false
-                    )}
-                    pLayout={handlePresenterLayoutChange}
-                    mLayout={handleMediaLayoutChange}
-                    setParticipantsArray={setParticipantsArray}
-                    header={HEADERS.presenters}
-                    roleStatus={roleStatus}
-                    talkingPplArray={[]}
-                    pexipBroadCastChannel={bc}
-                    currMediaLayoutIndex={mediaLayout}
-                    presenterLayout={presenterLayout}
-                    setPresenterAllLayout={setPresenterAllLayout}
-                  />
-                  <div id="applyBtnDiv" className="applyBtnDiv">
-                    <button className="btn" onClick={handleApplyClick}>
-                      Apply
-                    </button>
-                  </div>
-                </>
+                  <>
+                    <ComponentWrapper
+                      participantsArray={sortParticipants(
+                        participantsArray,
+                        PARTICIPANTS_LIST_PROTOCOLS,
+                        roleStatus,
+                        false
+                      )}
+                      pLayout={handlePresenterLayoutChange}
+                      mLayout={handleMediaLayoutChange}
+                      setParticipantsArray={setParticipantsArray}
+                      header={HEADERS.presenters}
+                      roleStatus={roleStatus}
+                      talkingPplArray={[]}
+                      pexipBroadCastChannel={bc}
+                      currMediaLayoutIndex={mediaLayout}
+                      presenterLayout={presenterLayout}
+                      setPresenterAllLayout={setPresenterAllLayout}
+                    />
+                    <div id="applyBtnDiv" className="applyBtnDiv">
+                      <button className="btn" onClick={handleApplyClick}>
+                        Apply
+                      </button>
+                    </div>
+                  </>
               }
             />
             <Route

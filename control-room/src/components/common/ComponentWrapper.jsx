@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import Presenter from "../layout/presenter/presenter.jsx";
 import PManagement from "../layout/prmanagement/pmanagement.jsx";
 import Media from "../layout/media/media.jsx";
+import RefreshBtn from "../utility/RefreshBtn/RefreshBtn.jsx";
 import { getTotalCapacity } from "../../constants/imageConstants.js";
 import { MAX_PARTICIPANTS } from "../../constants/constants.js";
 
@@ -30,6 +31,7 @@ const ComponentWrapper = ({
 
   return (
     <>
+      <RefreshBtn pexipBroadCastChannel={pexipBroadCastChannel}></RefreshBtn>
       <Presenter
         pLayout={pLayout}
         setSelectedLayout={setSelectedLayout}

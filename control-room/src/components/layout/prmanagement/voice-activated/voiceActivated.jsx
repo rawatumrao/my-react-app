@@ -1,4 +1,5 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
+import { AppContext } from "../../../../contexts/context";
 import { PropTypes } from "prop-types";
 import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -39,81 +40,98 @@ const VoiceActivated = ({
   const [data, setData] = useState(participantsArray);
   const [onStageOpen, setOnStageOpen] = useState(true);
   const [offScreenOpen, setOffScreenOpen] = useState(true);
+  const [settingSaved, setsettingSaved] = useState(
+    onStageItems.length || offScreenItems.length ? true : false
+  );
+  const { showRefresh, setShowRefresh, updatedShowRefreshVar } =
+    useContext(AppContext);
 
   useEffect(() => {
-    if (onStageItems.length || offScreenItems.length)
-      loadItems([...onStageItems, ...offScreenItems], false);
+    if (settingSaved) {
+      loadItems(onStageItems, offScreenItems);
+    }
   }, []);
 
   useEffect(() => {
-    loadItems(data, false);
+    if (settingSaved === false) {
+      loadItems(data, data);
+    } else if (settingSaved) setsettingSaved(false);
   }, [data]);
 
   useEffect(() => {
-    loadItems(participantsArray, true);
+    //console.log("Participants Array Updated : ", participantsArray);
+    const newParticipants = participantsArray.filter(
+      (participant) => !data.some((p) => p.uuid === participant.uuid)
+    );
+
+    // if somone new joins
+    if (newParticipants.length > 0) {
+      const updatedOffScreenItems = [
+        ...offScreenItems,
+        ...newParticipants.filter(
+          (participant) =>
+            !onStageItems.some((p) => p.uuid === participant.uuid)
+        ),
+      ];
+
+      const updateData = [...onStageItems, ...updatedOffScreenItems];
+
+      setData(updateData);
+    } else if (
+      // update when someone leaves
+      participantsArray.length < data.length
+    ) {
+      let allPpl = [...onStageItems, ...offScreenItems];
+      let updatedData = [];
+
+      participantsArray.forEach((item) => {
+        allPpl.forEach((elem) => {
+          if (item.uuid === elem.uuid) updatedData.push(elem);
+        });
+      });
+
+      setData(updatedData);
+    } else if (
+      participantsArray.length === [...onStageItems, ...offScreenItems].length
+    ) {
+      // update list with any changes
+      const keysToUpdate = ["overlayText", "isCameraMuted", "isMuted"];
+      let allPpl = [...onStageItems, ...offScreenItems];
+
+      participantsArray.forEach((item) => {
+        allPpl.forEach((elem) => {
+          if (item.uuid === elem.uuid) {
+            keysToUpdate.forEach((key) => {
+              if (item[key] !== elem[key]) {
+                elem[key] = item[key];
+              }
+            });
+          }
+        });
+      });
+
+      setData(allPpl);
+    }
   }, [participantsArray]);
 
-  const loadItems = (pplArr, participantsArrayUpdatedBool) => {
+  const loadItems = (onStageArr, offScreenArr) => {
     try {
-      // added the layout_groups to the new participant update only
-      if (participantsArrayUpdatedBool) {
-        pplArr.forEach((item) => {
-          data.find((elem) => {
-            if (elem.uuid === item.uuid) item.layout_group = elem.layout_group;
-          });
-        });
-      }
-
-      const onStage = pplArr.filter(
+      const onStage = onStageArr.filter(
         (item) =>
           item.layout_group !== null &&
           item.protocol !== "api" &&
           item.protocol !== "rtmp"
       );
 
-      const offScreen = pplArr.filter(
+      const offScreen = offScreenArr.filter(
         (item) =>
           item.layout_group === null &&
           item.protocol !== "api" &&
           item.protocol !== "rtmp"
       );
 
-      let updatedOnStageItems = [...onStage];
-      let updatedOffScreenItems = [...offScreen];
-
-      // order List
-      if (onStageItems.length) {
-        updatedOnStageItems = [];
-
-        onStageItems.forEach((item) => {
-          onStage.find((elem) => {
-            if (elem.uuid === item.uuid) {
-              updatedOnStageItems.push(elem);
-            }
-          });
-        });
-      }
-
-      if (offScreenItems.length) {
-        updatedOffScreenItems = [];
-
-        offScreenItems.forEach((item) => {
-          offScreen.find((elem) => {
-            if (elem.uuid === item.uuid) {
-              updatedOffScreenItems.push(elem);
-            }
-          });
-        });
-
-        // add the new participants to off screen
-        if (updatedOffScreenItems.length !== offScreen.length) {
-          for (let x = updatedOffScreenItems.length; x < offScreen.length; x++)
-            updatedOffScreenItems.push(offScreen[x]);
-        }
-      }
-
-      setOnStageItems(updatedOnStageItems);
-      setOffScreenItems(updatedOffScreenItems);
+      setOnStageItems(onStage);
+      setOffScreenItems(offScreen);
 
       pexipBroadCastChannel.postMessage({
         event: EVENTS.controlRoomStageOrders,
@@ -143,6 +161,7 @@ const VoiceActivated = ({
     if (!destination) {
       return;
     }
+
     let updatedOnStageItems = [...onStageItems];
     let updatedOffScreenItems = [...offScreenItems];
 
@@ -159,19 +178,17 @@ const VoiceActivated = ({
 
     destList.splice(destination.index, 0, movedItem);
 
-    if (destination.droppableId === "onStage") {
-      // Prevent adding more items to onStage if the limit is reache
-      if (
-        destination.droppableId === "onStage" &&
-        destList.length > layoutSize
-      ) {
-        console.log("Cannot add more participants to onStage. Limit reached.");
-        const errorMessage = `${LABEL_NAMES.blockParticipantOverMaxCount1} ${layoutSize} ${LABEL_NAMES.blockParticipantOverMaxCount2}`;
-        SHOW_VB_MSG(errorMessage);
-        return;
-      }
+    // Prevent adding more items to onStage if the limit is reache
+    if (destination.droppableId === "onStage" && destList.length > layoutSize) {
+      console.log("Cannot add more participants to onStage. Limit reached.");
+      const errorMessage = `${LABEL_NAMES.blockParticipantOverMaxCount1} ${layoutSize} ${LABEL_NAMES.blockParticipantOverMaxCount2}`;
+      SHOW_VB_MSG(errorMessage);
+      return;
+    }
 
+    if (destination.droppableId === "onStage") {
       updatedOnStageItems = updateLayoutGroups(destList);
+
       setOnStageItems(updatedOnStageItems);
     } else {
       updatedOffScreenItems = destList.map((item) => ({
@@ -192,6 +209,10 @@ const VoiceActivated = ({
 
     setData(updatedData);
     setParticipantsArray(updatedData);
+    if (showRefresh === false) {
+      setShowRefresh(true);
+      updatedShowRefreshVar(true);
+    }
   };
 
   const moveToOnStage = (item) => {
@@ -216,12 +237,19 @@ const VoiceActivated = ({
 
     setData(updatedData);
     setParticipantsArray(updatedData);
+    if (showRefresh === false) {
+      setShowRefresh(true);
+      updatedShowRefreshVar(true);
+    }
   };
   const movedToOffScreen = (item) => {
     const updatedOnStageItems = onStageItems.filter((i) => i.uuid != item.uuid);
     const updatedOffScreenItems = [
       ...offScreenItems,
-      { ...item, layout_group: null },
+      {
+        ...item,
+        layout_group: null,
+      },
     ];
     setOnStageItems(updateLayoutGroups(updatedOnStageItems));
     setOffScreenItems(updatedOffScreenItems);
@@ -229,6 +257,10 @@ const VoiceActivated = ({
 
     setData(updatedData);
     setParticipantsArray(updatedData);
+    if (showRefresh === false) {
+      setShowRefresh(true);
+      updatedShowRefreshVar(true);
+    }
   };
 
   const draggingStyles = (
@@ -294,6 +326,16 @@ const VoiceActivated = ({
             <ParticipantsListDisplayName {...item} header={header} />
           </span>
           <div>
+            {item.isMuted && (
+              <ParticipantsListBtn
+                attr={BUTTON_NAMES.audio}
+                {...item}
+                roleStatus={roleStatus}
+                pexipBroadCastChannel={pexipBroadCastChannel}
+              />
+            )}
+          </div>
+          <div>
             {!item.is_audio_only_call && item.isCameraMuted && (
               <>
                 <ParticipantsListBtn
@@ -303,16 +345,6 @@ const VoiceActivated = ({
                   pexipBroadCastChannel={pexipBroadCastChannel}
                 />
               </>
-            )}
-          </div>
-          <div>
-            {item.isMuted && (
-              <ParticipantsListBtn
-                attr={BUTTON_NAMES.audio}
-                {...item}
-                roleStatus={roleStatus}
-                pexipBroadCastChannel={pexipBroadCastChannel}
-              />
             )}
           </div>
         </div>

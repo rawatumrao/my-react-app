@@ -3,15 +3,23 @@
   flex-direction: column;
 }
 .gridContainer {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 5px;
-  }
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 5px;
+}
 
-  .zoom-image {
-    transition: transform 0, 3s ease;
-  }
-  
-  .zoom-image:hover {
-    transform: scale(1.1);
-  }
+.zoom-image {
+  transition: transform 0, 3s ease;
+}
+
+.zoom-image:hover {
+  transform: scale(1.1);
+}
+
+.view-all-layout .link-text {
+  display: inline-block;
+  font-size: 1em;
+  font-weight: 400;
+  margin: 10px;
+  z-index: 1;
+}

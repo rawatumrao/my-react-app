@@ -1,6 +1,7 @@
-import { useRef, useState } from "react";
+import { useRef, useState, useContext } from "react";
+import { AppContext } from "../../../contexts/context";
 import "../media/mediaStyle.css";
-import { images, headerImage } from "../../../constants/imageConstants.js";
+import { images } from "../../../constants/imageConstants.js";
 import { useNavigate } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -24,9 +25,9 @@ const Presenter = ({
   const [selectedImage, setSelectedImage] = useState(
     CONTROL_ROOM_PRESENTER_LAYOUT
   );
-
+  const { setShowRefresh, showRefresh, updatedShowRefreshVar } =
+    useContext(AppContext);
   const imageContainerRef = useRef(null);
-
   const navigate = useNavigate();
 
   const handleImageClick = (image) => {
@@ -38,6 +39,11 @@ const Presenter = ({
       event: EVENTS.controlRoomPresenterLayout,
       info: JSON.parse(JSON.stringify(image.layout)),
     });
+
+    if (showRefresh === false) {
+      setShowRefresh(true);
+      updatedShowRefreshVar(true);
+    }
   };
 
   const handleDoubleClick = (image) => {

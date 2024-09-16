@@ -1,4 +1,5 @@
 import { useContext, useState } from "react";
+import { AppContext } from "../../../contexts/context";
 import { PropTypes } from "prop-types";
 import "../media/mediaStyle.css";
 import "./pmanagementStyle.css";
@@ -12,12 +13,7 @@ import {
   faAngleRight,
 } from "@fortawesome/free-solid-svg-icons";
 //import { clearPinningConfig } from "../../../utils/fetchRequests.js";
-import { AppContext } from "../../../contexts/context.js";
-import {
-  EVENTS,
-  ALT_TAGS,
-  CONTROL_ROOM_VOICE_ACTIVATED,
-} from "../../../constants/constants.js";
+import { EVENTS, ALT_TAGS } from "../../../constants/constants.js";
 
 const PManagement = ({
   participantsArray,
@@ -28,8 +24,14 @@ const PManagement = ({
   pexipBroadCastChannel,
   layoutSize,
 }) => {
-  const { setVoiceActivated } = useContext(AppContext);
-  const [checked, setChecked] = useState(CONTROL_ROOM_VOICE_ACTIVATED);
+  const {
+    setVoiceActivated,
+    setShowRefresh,
+    showRefresh,
+    updatedShowRefreshVar,
+    voiceActivated,
+  } = useContext(AppContext);
+  const [checked, setChecked] = useState(voiceActivated);
   const [expanded, setExpanded] = useState(true);
 
   const handleChange = () => {
@@ -41,6 +43,11 @@ const PManagement = ({
       event: EVENTS.controlRoomVoiceActivated,
       info: checkedStatus,
     });
+
+    if (showRefresh === false) {
+      setShowRefresh(true);
+      updatedShowRefreshVar(true);
+    }
   };
 
   const toggleExpandCollapse = () => {
