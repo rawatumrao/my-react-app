@@ -77,6 +77,7 @@
   border-radius: 8px;
   cursor: pointer;
   transition: transform 0.3s ease;
+  background-color: var(--inactive-bg);
 }
 
 .zoom-image {
@@ -208,15 +209,19 @@
   align-items: center;
   height: 100px;
   margin: 10px;
-  border: transparent 3px solid;
+  border: var(--inactive-border) 3px solid;
 }
 
 .mediaImagesDiv .selected {
-  border: #00b6ff 3px solid;
+  border: var(--selected-border) 3px solid;
+  background-color: var(--selected-bg);
 }
 
 .header-image {
   cursor: pointer;
+  border: var(--selected-border) 3px solid;
+  background-color: var(--selected-bg);
+  height: auto;
 }
 
 /* Meda Queries */

@@ -215,10 +215,7 @@ const VoiceActivated = ({
     }
   };
 
-  const moveToOnStage = (item) => {
-    const updatedOffScreenItems = offScreenItems.filter(
-      (i) => i.uuid !== item.uuid
-    );
+  const moveToOnStage = (item) => {  
     const updatedOnStageItems = [
       ...onStageItems,
       { ...item, layout_group: numberToWords(onStageItems.length + 1) },
@@ -230,10 +227,14 @@ const VoiceActivated = ({
       SHOW_VB_MSG(errorMessage);
       return;
     }
+    const recalculatedOnStageItems = updateLayoutGroups(updatedOnStageItems);
+    const updatedOffScreenItems = offScreenItems.filter(
+      (i) => i.uuid !== item.uuid
+    );
 
-    setOnStageItems(updateLayoutGroups(updatedOnStageItems));
+    setOnStageItems(recalculatedOnStageItems);
     setOffScreenItems(updatedOffScreenItems);
-    const updatedData = [...updatedOnStageItems, ...updatedOffScreenItems];
+    const updatedData = [...recalculatedOnStageItems, ...updatedOffScreenItems];
 
     setData(updatedData);
     setParticipantsArray(updatedData);
@@ -244,6 +245,7 @@ const VoiceActivated = ({
   };
   const movedToOffScreen = (item) => {
     const updatedOnStageItems = onStageItems.filter((i) => i.uuid != item.uuid);
+    const recalculatedOnStageItems= updateLayoutGroups(updatedOnStageItems);
     const updatedOffScreenItems = [
       ...offScreenItems,
       {
@@ -251,9 +253,9 @@ const VoiceActivated = ({
         layout_group: null,
       },
     ];
-    setOnStageItems(updateLayoutGroups(updatedOnStageItems));
+    setOnStageItems(recalculatedOnStageItems);
     setOffScreenItems(updatedOffScreenItems);
-    const updatedData = [...updatedOnStageItems, ...updatedOffScreenItems];
+    const updatedData = [...recalculatedOnStageItems, ...updatedOffScreenItems];
 
     setData(updatedData);
     setParticipantsArray(updatedData);

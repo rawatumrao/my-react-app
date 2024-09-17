@@ -9,11 +9,11 @@ import {
   faAngleDown,
   faAngleRight,
 } from "@fortawesome/free-solid-svg-icons";
-import defaultLayout from "../../../images/defaultLayout.png";
-import largeVideoLayout from "../../../images/largeVideoLayout.png";
-import largeContentLayout from "../../../images/largeContentLayout.png";
-import videoOnly from "../../../images/videoOnly.png";
-import contentOnly from "../../../images/contentOnly.png";
+import defaultLayout from "../../../images/defaultLayout.svg";
+import largeVideoLayout from "../../../images/largeVideoLayout.svg";
+import largeContentLayout from "../../../images/largeContentLayout.svg";
+import videoOnly from "../../../images/videoOnly.svg";
+import contentOnly from "../../../images/contentOnly.svg";
 import { EVENTS } from "../../../constants/constants";
 import { getLayoutName } from "../../../utils/layoutFuncs";
 
@@ -123,8 +123,10 @@ const Media = ({
                       ? "mediaImages selected"
                       : "mediaImages"
                   }
-                  alt={getLayoutName(index)}
-                  title=""
+                  alt={getLayoutName(index).replaceAll("_", " ").toLowerCase()}
+                  title={getLayoutName(index)
+                    .replaceAll("_", " ")
+                    .toLowerCase()}
                   onClick={() => handleImageClick(index)}
                 />
               );

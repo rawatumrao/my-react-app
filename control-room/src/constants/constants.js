@@ -6,7 +6,7 @@ export const ENVIRONMENT = {
   dev: "dev",
 };
 
-export const ENV = ENVIRONMENT.prod;
+export const ENV = ENVIRONMENT.dev;
 
 // parent page vars
 const pexipDataJsonVar = parent?.parent?.pexipDataJson;
@@ -153,7 +153,7 @@ export const EVENTS = {
   controlRoomRefresh: "controlRoomRefresh",
   controlRoomApply: "controlRoomApply",
   controlRoomShowRefresh: "controlRoomShowRefresh",
-  conntrolRoomisLoaded: "conntrolRoomisLoaded",
+  controlRoomIsLoaded: "controlRoomIsLoaded",
 };
 
 export const API_CALLS = {

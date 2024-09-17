@@ -121,21 +121,21 @@ function App() {
         Data.current.meRole = findRoleOfUser(updatedData);
         setParticipantsArray(updatedData);
         // console.log(msg.data.info.participants);
-      } else if (msg.data.event === EVENTS.conntrolRoomisLoaded) {
+      } else if (msg.data.event === EVENTS.controlRoomisLoaded) {
         setIsLoaded(true);
       }
     };
+
+    if (isLoaded === false) {
+      bc.postMessage({
+        event: EVENTS.controlRoomIsLoaded,
+        info: {},
+      });
+    }
   }, []);
 
   // Setting up presenter and media layout by clicking on apply button
   const handleApplyClick = useCallback(async () => {
-    if (ENV === ENVIRONMENT.dev) {
-      if (showRefresh) {
-        setShowRefresh(false);
-        return;
-      }
-    }
-
     try {
       let selectedLayout =
         presenterAllLayout !== null ? presenterAllLayout : presenterLayout;
@@ -188,15 +188,7 @@ function App() {
           (participant) => participant?.layout_group
         );
 
-        await applyTransformLayout(selectedLayout);
-
-        if (currentPinValue) {
-          await clearPinningConfig({
-            token: Data.current.token,
-          });
-          setCurrentPinValue(0);
-        }
-
+        // Clear participant layout groups
         if (totalParticipants_onStage.length > 0) {
           for (const participant of totalParticipants_onStage) {
             await clearParticipantFromLayoutGroup({
@@ -204,15 +196,41 @@ function App() {
               token: Data.current.token,
             });
           }
-          bc.postMessage({
-            event: EVENTS.controlRoomApply,
-            info: {
-              onStage: [],
-              offScreen: participantsArray,
-            },
-          });
         }
-        // turnOffSpotlights();
+
+        // Apply presenter layout
+        await applyTransformLayout(selectedLayout);
+
+        // Make Pinning Config Voice Activated Always
+        // if (currentPinValue) {
+        await clearPinningConfig({
+          token: Data.current.token,
+        });
+        setCurrentPinValue(0);
+        // }
+
+        const updatedParticipantsArray = participantsArray.map((participant) =>
+          totalParticipants_onStage.includes(participant)
+            ? { ...participant, layout_group: null }
+            : participant
+        );
+
+        setParticipantsArray(updatedParticipantsArray);
+        setInitialParticipantsArray(updatedParticipantsArray);
+
+        // filter offScreen participants where layout_group is null
+        // const offScreenParticipants = updatedParticipantsArray.filter(
+        //   (participant) => participant.layout_group === null
+        // );
+
+        //Clear the onStage and OffScreen on Broadcast Channel
+        bc.postMessage({
+          event: EVENTS.controlRoomStageOrders,
+          info: {
+            onStage: [],
+            offScreen: [],
+          },
+        });
       } else {
         if (selectedLayout === "ac") {
           const errorMessage =
@@ -293,8 +311,8 @@ function App() {
       if (mediaLayout !== null && prevMediaLayout.current !== mediaLayout) {
         try {
           LAYOUT_PANEL_VIEWER(getLayoutName(mediaLayout));
-        } catch (e) {
-          console.log("Error while setting up LAYOUT_PANEL_VIEWER: ", e);
+        } catch (err) {
+          console.log(`Error while setting up LAYOUT_PANEL_VIEWER: ${err}`);
         }
       }
 
@@ -389,6 +407,7 @@ function App() {
             <Route
               path="/"
               element={
+                isLoaded ? (
                   <>
                     <ComponentWrapper
                       participantsArray={sortParticipants(
@@ -414,6 +433,9 @@ function App() {
                       </button>
                     </div>
                   </>
+                ) : (
+                  <FontAwesomeIcon icon={faCircleNotch} spin />
+                )
               }
             />
             <Route

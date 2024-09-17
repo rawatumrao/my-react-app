@@ -10,6 +10,7 @@
   background-color: var(--button-bgColor);
   border-radius: var(--button-borderRadius);
   cursor: pointer;
+  color: #fff;
 }
 
 .refreshBtn:hover {

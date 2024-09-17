@@ -47,6 +47,22 @@ body {
   --green-icons: #19c75f;
   --yellow-icons: #ffdc81;
   --onStage-bgColor: #5e609c;
+
+  /* Image Boxes */
+  --selected-boxes: #5e609c;
+  --selected-icons: #393c78;
+  --selected-bg: #dcddf2;
+  --selected-border: #6ec8db;
+
+  --inactive-boxes: #5e609c;
+  --inactive-icons: #393c78;
+  --inactive-bg: #24253c;
+  --inactive-border: #8f90a4;
+
+  --disabled-boxes: #484848;
+  --disabled-icons: #3e3e3e;
+  --disabled-bg: #2d2d2d;
+  --disabled-border: #2d2d2d;
 }
 
 button {

@@ -8,14 +8,14 @@ import { EVENTS } from "../../../constants/constants.js";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faAngleLeft } from "@fortawesome/free-solid-svg-icons";
 
-const ViewAllLayout = ({
-  setPresenterAllLayout,
-  pexipBroadCastChannel,
-  presenterLayout,
-}) => {
+const ViewAllLayout = ({ setPresenterAllLayout, pexipBroadCastChannel }) => {
+  const {
+    showRefresh,
+    setShowRefresh,
+    updatedShowRefreshVar,
+    presenterLayout,
+  } = useContext(AppContext);
   const [selectedImage, setSelectedImage] = useState(presenterLayout);
-  const { showRefresh, setShowRefresh, updatedShowRefreshVar } =
-    useContext(AppContext);
   const navigate = useNavigate();
 
   const handleBackClick = () => {
@@ -63,7 +63,8 @@ const ViewAllLayout = ({
               <div key={index} className="box">
                 <img
                   src={
-                    selectedImage?.imageUrl === image.imageUrl
+                    selectedImage === image.layout ||
+                    selectedImage?.layout === image.layout
                       ? image.selectedImageUrl
                       : image.imageUrl
                   }
@@ -85,7 +86,8 @@ const ViewAllLayout = ({
               <div key={index} className="box">
                 <img
                   src={
-                    selectedImage?.imageUrl === image.imageUrl
+                    selectedImage === image.layout ||
+                    selectedImage?.layout === image.layout
                       ? image.selectedImageUrl
                       : image.imageUrl
                   }
@@ -107,7 +109,8 @@ const ViewAllLayout = ({
               <div key={index} className="box">
                 <img
                   src={
-                    selectedImage?.imageUrl === image.imageUrl
+                    selectedImage === image.layout ||
+                    selectedImage?.layout === image.layout
                       ? image.selectedImageUrl
                       : image.imageUrl
                   }
@@ -129,7 +132,8 @@ const ViewAllLayout = ({
               <div key={index} className="box">
                 <img
                   src={
-                    selectedImage?.imageUrl === image.imageUrl
+                    selectedImage === image.layout ||
+                    selectedImage?.layout === image.layout
                       ? image.selectedImageUrl
                       : image.imageUrl
                   }

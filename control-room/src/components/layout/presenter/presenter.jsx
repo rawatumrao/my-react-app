@@ -10,23 +10,17 @@ import {
   faAngleDown,
   faAngleRight,
 } from "@fortawesome/free-solid-svg-icons";
-import {
-  EVENTS,
-  CONTROL_ROOM_PRESENTER_LAYOUT,
-} from "../../../constants/constants.js";
+import { EVENTS } from "../../../constants/constants.js";
 
-const Presenter = ({
-  pLayout,
-  setSelectedLayout,
-  pexipBroadCastChannel,
-  presenterLayout,
-}) => {
+const Presenter = ({ pLayout, setSelectedLayout, pexipBroadCastChannel }) => {
+  const {
+    setShowRefresh,
+    showRefresh,
+    updatedShowRefreshVar,
+    presenterLayout,
+  } = useContext(AppContext);
   const [expanded, setExpanded] = useState(false);
-  const [selectedImage, setSelectedImage] = useState(
-    CONTROL_ROOM_PRESENTER_LAYOUT
-  );
-  const { setShowRefresh, showRefresh, updatedShowRefreshVar } =
-    useContext(AppContext);
+  const [selectedImage, setSelectedImage] = useState(presenterLayout);
   const imageContainerRef = useRef(null);
   const navigate = useNavigate();
 
@@ -122,7 +116,8 @@ const Presenter = ({
               <img
                 key={index}
                 src={
-                  selectedImage?.imageUrl === image.imageUrl
+                  selectedImage === image.layout ||
+                  selectedImage?.layout === image.layout
                     ? image.selectedImageUrl
                     : image.imageUrl
                 }
