@@ -1,7 +1,6 @@
 import { useRef, useState, useContext } from "react";
 import { AppContext } from "../../../contexts/context";
 import "../media/mediaStyle.css";
-import { images } from "../../../constants/imageConstants.js";
 import { useNavigate } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -11,6 +10,7 @@ import {
   faAngleRight,
 } from "@fortawesome/free-solid-svg-icons";
 import { EVENTS } from "../../../constants/constants.js";
+import { PresenterImages, getParticipantsNumber } from "../../common/presenterImages.jsx";
 
 const Presenter = ({ pLayout, setSelectedLayout, pexipBroadCastChannel }) => {
   const {
@@ -18,11 +18,31 @@ const Presenter = ({ pLayout, setSelectedLayout, pexipBroadCastChannel }) => {
     showRefresh,
     updatedShowRefreshVar,
     presenterLayout,
+    voiceActivated,
   } = useContext(AppContext);
   const [expanded, setExpanded] = useState(false);
   const [selectedImage, setSelectedImage] = useState(presenterLayout);
+  const [sortedImages, setSortedImages] = useState([PresenterImages]);
   const imageContainerRef = useRef(null);
   const navigate = useNavigate();
+
+  const sortImages = () => {
+    const selectedParticipantsNumber =getParticipantsNumber(presenterLayout);
+    const greaterOrEqual = PresenterImages.filter(image=> image.participantsNumber >= selectedParticipantsNumber);
+    const lessThan = PresenterImages.filter(image => image.participantsNumber < selectedParticipantsNumber);
+  
+    greaterOrEqual.sort((a,b) => a.participantsNumber - b.participantsNumber);
+    lessThan.sort((a,b)=> a.participantsNumber - b.participantsNumber);
+  
+    setSortedImages([...greaterOrEqual, ...lessThan]);
+  };
+
+  const toggleExpandCollapse = () => {
+    if(!expanded){
+      sortImages();
+    }
+    setExpanded(!expanded);
+  };
 
   const handleImageClick = (image) => {
     pLayout(image.layout);
@@ -44,9 +64,7 @@ const Presenter = ({ pLayout, setSelectedLayout, pexipBroadCastChannel }) => {
     setSelectedImage(image);
   };
 
-  const toggleExpandCollapse = () => {
-    setExpanded(!expanded);
-  };
+  
 
   //Scrolling fuctions
   const handleNext = () => {
@@ -70,9 +88,10 @@ const Presenter = ({ pLayout, setSelectedLayout, pexipBroadCastChannel }) => {
   const handleSeeAllClick = () => {
     navigate("/view-all");
   };
-  const sortedImages = [...images].sort((a, b) => {
-    return a.participantsNumber - b.participantsNumber;
-  });
+
+  // const sortedImages = [...PresenterImages].sort((a, b) => {
+  //   return a.participantsNumber - b.participantsNumber;
+  // });
 
   return (
     <div className="expand-collapse-container">
@@ -84,11 +103,15 @@ const Presenter = ({ pLayout, setSelectedLayout, pexipBroadCastChannel }) => {
             </span>
             <span className="" onClick={toggleExpandCollapse}>
               <img
-                className="header-image"
+                className={
+                  presenterLayout === "5:7" && voiceActivated === false
+                    ? "header-image disabledImage"
+                    : "header-image"
+                }
                 src={
-                  sortedImages.find((item) => {
-                    if (item.layout === presenterLayout) return item;
-                  }).imageUrl
+                  presenterLayout === "5:7" && voiceActivated
+                    ? PresenterImages[0].selectedImageUrl
+                    : sortedImages.find((item) => item.layout === presenterLayout)?.imageUrl || PresenterImages[1].imageUrl
                 }
               ></img>
             </span>
@@ -112,21 +135,61 @@ const Presenter = ({ pLayout, setSelectedLayout, pexipBroadCastChannel }) => {
             onClick={handlePrev}
           />
           <div className="images" ref={imageContainerRef}>
-            {sortedImages.map((image, index) => (
-              <img
-                key={index}
-                src={
-                  selectedImage === image.layout ||
-                  selectedImage?.layout === image.layout
-                    ? image.selectedImageUrl
-                    : image.imageUrl
-                }
-                alt={`Image ${index + 1}`}
-                onClick={() => handleImageClick(image)}
-                onDoubleClick={() => handleDoubleClick(image)}
-                className="zoom-image"
-              />
-            ))}
+            {voiceActivated
+              ? sortedImages.map((image, index) => (
+                  <img
+                    key={index}
+                    src={
+                      selectedImage === image.layout ||
+                      selectedImage?.layout === image.layout ||
+                      image.scope === "Adaptive"
+                        ? image.selectedImageUrl
+                        : image.imageUrl
+                    }
+                    title={image.alt}
+                    alt={image.alt}
+                    onClick={() => handleImageClick(image)}
+                    onDoubleClick={() => handleDoubleClick(image)}
+                    className={`image ${
+                      selectedImage === image.layout ||
+                      selectedImage?.layout === image.layout
+                        ? "zoom-image selectedImage"
+                        : "zoom-image"
+                    }`}
+                  />
+                ))
+              : sortedImages.map((image, index) => (
+                  <img
+                    key={index}
+                    src={
+                      (selectedImage === image.layout ||
+                        selectedImage?.layout === image.layout) &&
+                      image.scope !== "Adaptive"
+                        ? image.selectedImageUrl
+                        : image.imageUrl
+                    }
+                    title={image.alt}
+                    alt={image.alt}
+                    onClick={
+                      image.scope === "Adaptive"
+                        ? () => {}
+                        : () => handleImageClick(image)
+                    }
+                    onDoubleClick={
+                      image.scope === "Adaptive"
+                        ? () => {}
+                        : () => handleDoubleClick(image)
+                    }
+                    className={`image ${
+                      image.scope === "Adaptive"
+                        ? "zoom-image"
+                        : selectedImage === image.layout ||
+                          selectedImage?.layout === image.layout
+                        ? "zoom-image selectedImage"
+                        : "zoom-image"
+                    }`}
+                  />
+                ))}
           </div>
           <FontAwesomeIcon
             icon={faChevronRight}

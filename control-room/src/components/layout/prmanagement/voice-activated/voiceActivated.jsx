@@ -21,6 +21,7 @@ import {
 import { layoutGroupValue } from "../../../../constants/imageConstants";
 import ParticipantsListBtn from "../../../utility/ParticipantsListBtn/ParticipantsListBtn";
 import ParticipantsListDisplayName from "../../../utility/ParticipantsListDisplayName/ParticipantsListDisplayName";
+import { PresenterImages } from "../../../common/presenterImages";
 
 const numberToWords = (num) => {
   return layoutGroupValue[num - 1] || "unknown";
@@ -33,7 +34,6 @@ const VoiceActivated = ({
   roleStatus,
   talkingPplArray,
   pexipBroadCastChannel,
-  layoutSize,
 }) => {
   const [onStageItems, setOnStageItems] = useState(CONTROL_ROOM_ON_STAGE);
   const [offScreenItems, setOffScreenItems] = useState(CONTROL_ROOM_OFF_SCREEN);
@@ -43,8 +43,12 @@ const VoiceActivated = ({
   const [settingSaved, setsettingSaved] = useState(
     onStageItems.length || offScreenItems.length ? true : false
   );
-  const { showRefresh, setShowRefresh, updatedShowRefreshVar } =
-    useContext(AppContext);
+  const {
+    showRefresh,
+    setShowRefresh,
+    updatedShowRefreshVar,
+    presenterLayout,
+  } = useContext(AppContext);
 
   useEffect(() => {
     if (settingSaved) {
@@ -179,9 +183,16 @@ const VoiceActivated = ({
     destList.splice(destination.index, 0, movedItem);
 
     // Prevent adding more items to onStage if the limit is reache
-    if (destination.droppableId === "onStage" && destList.length > layoutSize) {
+    let sizeOfLayout = PresenterImages.find(
+      (item) => presenterLayout === item.layout
+    ).total;
+
+    if (
+      destination.droppableId === "onStage" &&
+      destList.length > sizeOfLayout
+    ) {
       console.log("Cannot add more participants to onStage. Limit reached.");
-      const errorMessage = `${LABEL_NAMES.blockParticipantOverMaxCount1} ${layoutSize} ${LABEL_NAMES.blockParticipantOverMaxCount2}`;
+      const errorMessage = `${LABEL_NAMES.blockParticipantOverMaxCount1} ${sizeOfLayout} ${LABEL_NAMES.blockParticipantOverMaxCount2}`;
       SHOW_VB_MSG(errorMessage);
       return;
     }
@@ -215,15 +226,18 @@ const VoiceActivated = ({
     }
   };
 
-  const moveToOnStage = (item) => {  
+  const moveToOnStage = (item) => {
     const updatedOnStageItems = [
       ...onStageItems,
       { ...item, layout_group: numberToWords(onStageItems.length + 1) },
     ];
+    let sizeOfLayout = PresenterImages.find(
+      (item) => presenterLayout === item.layout
+    ).total;
 
-    if (updatedOnStageItems.length > layoutSize) {
+    if (updatedOnStageItems.length > sizeOfLayout) {
       console.log("Cannot add more participants to onStage. Limit reached.");
-      const errorMessage = `${LABEL_NAMES.blockParticipantOverMaxCount1} ${layoutSize} ${LABEL_NAMES.blockParticipantOverMaxCount2}`;
+      const errorMessage = `${LABEL_NAMES.blockParticipantOverMaxCount1} ${sizeOfLayout} ${LABEL_NAMES.blockParticipantOverMaxCount2}`;
       SHOW_VB_MSG(errorMessage);
       return;
     }
@@ -245,7 +259,7 @@ const VoiceActivated = ({
   };
   const movedToOffScreen = (item) => {
     const updatedOnStageItems = onStageItems.filter((i) => i.uuid != item.uuid);
-    const recalculatedOnStageItems= updateLayoutGroups(updatedOnStageItems);
+    const recalculatedOnStageItems = updateLayoutGroups(updatedOnStageItems);
     const updatedOffScreenItems = [
       ...offScreenItems,
       {
@@ -360,7 +374,12 @@ const VoiceActivated = ({
         <div className="list-container">
           <h4 onClick={() => setOnStageOpen(!onStageOpen)}>
             <FontAwesomeIcon icon={onStageOpen ? faAngleDown : faAngleRight} />
-            {` On Stage`} ({onStageItems.length}/{layoutSize})
+            {` On Stage`} ({onStageItems.length}/
+            {
+              PresenterImages.find((item) => presenterLayout === item.layout)
+                .total
+            }
+            {`)`}
           </h4>
           {onStageOpen && (
             <Droppable droppableId="onStage">

@@ -63,9 +63,10 @@ function App() {
     createData(INITIAL_PARTICIPANT)
   );
   const [roleStatus, setRoleStatus] = useState(ROLE_STATUS);
-  const [initialParticipantsArray, setInitialParticipantsArray] = useState(
-    () => [...CONTROL_ROOM_ON_STAGE, ...CONTROL_ROOM_OFF_SCREEN]
-  );
+  const [initialParticipantsArray, setInitialParticipantsArray] = useState([
+    ...CONTROL_ROOM_ON_STAGE,
+    ...CONTROL_ROOM_OFF_SCREEN,
+  ]);
   const [currentLayout, setCurentlayout] = useState(null);
   const [currentPinValue, setCurrentPinValue] = useState(0);
   const [isLoaded, setIsLoaded] = useState(CONTROL_ROOM_IS_LOADED);
@@ -123,6 +124,9 @@ function App() {
         // console.log(msg.data.info.participants);
       } else if (msg.data.event === EVENTS.controlRoomisLoaded) {
         setIsLoaded(true);
+      } else if (msg.data.event === EVENTS.controlRoomLayoutUpdate) {
+        setPresenterLayout(msg?.data?.info?.presenterLayout);
+        setPresenterAllLayout(msg?.data?.info?.presenterLayout);
       }
     };
 
@@ -178,7 +182,11 @@ function App() {
         );
       } else {
         onStageParticipantsWithLGupdated = participantsArray.filter(
-          (participant) => participant?.layout_group
+          (participant) => participant?.layout_group!==null
+        );
+
+        offScreenParticipantsWithLGupdated = participantsArray.filter(
+          (participant) => participant?.layout_group===null
         );
       }
 
@@ -222,17 +230,8 @@ function App() {
         // const offScreenParticipants = updatedParticipantsArray.filter(
         //   (participant) => participant.layout_group === null
         // );
-
-        //Clear the onStage and OffScreen on Broadcast Channel
-        bc.postMessage({
-          event: EVENTS.controlRoomStageOrders,
-          info: {
-            onStage: [],
-            offScreen: [],
-          },
-        });
       } else {
-        if (selectedLayout === "ac") {
+        if (selectedLayout === "5:7") {
           const errorMessage =
             "The Adaptive Layout is only applicable for Voice-Activated ON";
           throw new ValidationError(errorMessage);
@@ -316,10 +315,32 @@ function App() {
         }
       }
 
+      // ordering onStage and offScreen
+      let onStage = [];
+      let offScreen = [];
+
+      if (voiceActivated === false) {
+        onStage = participantsArray.filter(
+          (item) =>
+            item.layout_group !== null &&
+            item.protocol !== "api" &&
+            item.protocol !== "rtmp"
+        );
+
+        offScreen = participantsArray.filter(
+          (item) =>
+            item.layout_group === null &&
+            item.protocol !== "api" &&
+            item.protocol !== "rtmp"
+        );
+      }
+
       // updated default variables videobridge.jsp
       bc.postMessage({
         event: EVENTS.controlRoomApply,
         info: {
+          onStage: onStage,
+          offScreen: offScreen,
           voiceActivated: voiceActivated,
           presenterLayout: presenterLayout,
           showRefresh: false,

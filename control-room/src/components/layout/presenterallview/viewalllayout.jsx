@@ -1,12 +1,12 @@
-import { useState, useContext } from "react";
+import { useState, useContext, useEffect } from "react";
 import { AppContext } from "../../../contexts/context";
 import { useNavigate } from "react-router-dom";
 import "../media/mediaStyle.css";
 import "./viewalllayoutStyle.css";
-import { images } from "../../../constants/imageConstants.js";
 import { EVENTS } from "../../../constants/constants.js";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faAngleLeft } from "@fortawesome/free-solid-svg-icons";
+import { PresenterImages } from "../../common/presenterImages.jsx";
 
 const ViewAllLayout = ({ setPresenterAllLayout, pexipBroadCastChannel }) => {
   const {
@@ -14,9 +14,23 @@ const ViewAllLayout = ({ setPresenterAllLayout, pexipBroadCastChannel }) => {
     setShowRefresh,
     updatedShowRefreshVar,
     presenterLayout,
+    voiceActivated,
   } = useContext(AppContext);
   const [selectedImage, setSelectedImage] = useState(presenterLayout);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    pexipBroadCastChannel.onmessage = (msg) => {
+      if (msg.data.event === EVENTS.controlRoomLayoutUpdate) {
+        setPresenterAllLayout(msg?.data?.info?.presenterLayout);
+        setSelectedImage((prevImage) =>
+          prevImage === msg?.data?.info?.presenterLayout
+            ? null
+            : msg?.data?.info?.presenterLayout
+        );
+      }
+    };
+  }, []);
 
   const handleBackClick = () => {
     navigate("/");
@@ -42,7 +56,7 @@ const ViewAllLayout = ({ setPresenterAllLayout, pexipBroadCastChannel }) => {
   };
 
   const categorizeImages = (category) => {
-    return images.filter((image) => image.scope.startsWith(category));
+    return PresenterImages.filter((image) => image.scope.startsWith(category));
   };
 
   const adaptiveImages = categorizeImages("Adaptive");
@@ -59,24 +73,61 @@ const ViewAllLayout = ({ setPresenterAllLayout, pexipBroadCastChannel }) => {
         <div>
           <span className="text-style"> Adaptive</span>
           <div className="gridContainer">
-            {adaptiveImages.map((image, index) => (
-              <div key={index} className="box">
-                <img
-                  src={
-                    selectedImage === image.layout ||
-                    selectedImage?.layout === image.layout
-                      ? image.selectedImageUrl
-                      : image.imageUrl
-                  }
-                  alt={`Image ${index + 1}`}
-                  className={`image ${
-                    selectedImage === image.layout ? "selected" : ""
-                  }`}
-                  onClick={() => handleImageClick(image)}
-                  onDoubleClick={() => handleDoubleClick(image)}
-                />
-              </div>
-            ))}
+            {voiceActivated
+              ? adaptiveImages.map((image, index) => (
+                  <img
+                    key={index}
+                    src={
+                      selectedImage === image.layout ||
+                      selectedImage?.layout === image.layout ||
+                      image.scope === "Adaptive"
+                        ? image.selectedImageUrl
+                        : image.imageUrl
+                    }
+                    title={image.alt}
+                    alt={image.alt}
+                    onClick={() => handleImageClick(image)}
+                    onDoubleClick={() => handleDoubleClick(image)}
+                    className={`image ${
+                      selectedImage === image.layout ||
+                      selectedImage?.layout === image.layout
+                        ? "zoom-image selectedImage"
+                        : "zoom-image"
+                    }`}
+                  />
+                ))
+              : adaptiveImages.map((image, index) => (
+                  <img
+                    key={index}
+                    src={
+                      (selectedImage === image.layout ||
+                        selectedImage?.layout === image.layout) &&
+                      image.scope !== "Adaptive"
+                        ? image.selectedImageUrl
+                        : image.imageUrl
+                    }
+                    title={image.alt}
+                    alt={image.alt}
+                    onClick={
+                      image.scope === "Adaptive"
+                        ? () => {}
+                        : () => handleImageClick(image)
+                    }
+                    onDoubleClick={
+                      image.scope === "Adaptive"
+                        ? () => {}
+                        : () => handleDoubleClick(image)
+                    }
+                    className={`image ${
+                      image.scope === "Adaptive"
+                        ? "zoom-image"
+                        : selectedImage === image.layout ||
+                          selectedImage?.layout === image.layout
+                        ? "zoom-image selectedImage"
+                        : "disabledImage"
+                    }`}
+                  />
+                ))}
           </div>
         </div>
         <div>
@@ -85,17 +136,23 @@ const ViewAllLayout = ({ setPresenterAllLayout, pexipBroadCastChannel }) => {
             {speakerFocusedImages.map((image, index) => (
               <div key={index} className="box">
                 <img
+                  key={index}
                   src={
                     selectedImage === image.layout ||
-                    selectedImage?.layout === image.layout
+                    selectedImage?.layout === image.layout ||
+                    image.scope === "Adaptive"
                       ? image.selectedImageUrl
                       : image.imageUrl
                   }
-                  alt={`Image ${index + 1}`}
+                  title={image.alt}
+                  alt={image.alt}
                   onClick={() => handleImageClick(image)}
                   onDoubleClick={() => handleDoubleClick(image)}
                   className={`image ${
-                    selectedImage === image.layout ? "selected" : ""
+                    selectedImage === image.layout ||
+                    selectedImage?.layout === image.layout
+                      ? "zoom-image selectedImage"
+                      : "zoom-image"
                   }`}
                 />
               </div>
@@ -108,17 +165,23 @@ const ViewAllLayout = ({ setPresenterAllLayout, pexipBroadCastChannel }) => {
             {equalSizeImages.map((image, index) => (
               <div key={index} className="box">
                 <img
+                  key={index}
                   src={
                     selectedImage === image.layout ||
-                    selectedImage?.layout === image.layout
+                    selectedImage?.layout === image.layout ||
+                    image.scope === "Adaptive"
                       ? image.selectedImageUrl
                       : image.imageUrl
                   }
-                  alt={`Image ${index + 1}`}
+                  title={image.alt}
+                  alt={image.alt}
                   onClick={() => handleImageClick(image)}
                   onDoubleClick={() => handleDoubleClick(image)}
                   className={`image ${
-                    selectedImage === image.layout ? "selected" : ""
+                    selectedImage === image.layout ||
+                    selectedImage?.layout === image.layout
+                      ? "zoom-image selectedImage"
+                      : "zoom-image"
                   }`}
                 />
               </div>
@@ -131,17 +194,23 @@ const ViewAllLayout = ({ setPresenterAllLayout, pexipBroadCastChannel }) => {
             {largeGroupImages.map((image, index) => (
               <div key={index} className="box">
                 <img
+                  key={index}
                   src={
                     selectedImage === image.layout ||
-                    selectedImage?.layout === image.layout
+                    selectedImage?.layout === image.layout ||
+                    image.scope === "Adaptive"
                       ? image.selectedImageUrl
                       : image.imageUrl
                   }
-                  alt={`Image ${index + 1}`}
+                  title={image.alt}
+                  alt={image.alt}
                   onClick={() => handleImageClick(image)}
                   onDoubleClick={() => handleDoubleClick(image)}
                   className={`image ${
-                    selectedImage === image.layout ? "selected" : ""
+                    selectedImage === image.layout ||
+                    selectedImage?.layout === image.layout
+                      ? "zoom-image selectedImage"
+                      : "zoom-image"
                   }`}
                 />
               </div>

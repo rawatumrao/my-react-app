@@ -8,6 +8,6 @@ export default defineConfig({
     port: 5180,
   },
   build: {
-    assetsInlineLimit: 5000,
+    assetsInlineLimit: 1000000,
   },
 });

@@ -1,42 +1,3 @@
-import {
-  sf1,
-  sf1_selected,
-  sf2,
-  sf2_selected,
-  sf3,
-  sf3_selected,
-  adaptive,
-  adaptive_selected,
-} from "./icons/Adaptive_SF.js";
-import {
-  es1,
-  es1_selected,
-  es2,
-  es2_selected,
-  es3,
-  es3_selected,
-  es4,
-  es4_selected,
-  es5,
-  es5_selected,
-  es6,
-  es6_selected,
-} from "./icons/equalssizeimages.js";
-import {
-  lg1,
-  lg1_selected,
-  lg2,
-  lg2_selected,
-  lg3,
-  lg3_selected,
-  lg4,
-  lg4_selected,
-  lg5,
-  lg5_selected,
-  lg6,
-  lg6_selected,
-} from "./icons/largegroupimages.js";
-
 export const mlayout1 =
   "data:image/svg+xml;utf8,<svg width='100' height='70' viewBox='0 0 140 88' fill='none' xmlns='http://www.w3.org/2000/svg'><rect x='0.5' y='0.5' width='139' height='87' rx='3.5' fill='%2387919a' stroke='%23BBBFC3'></rect><rect x='4' y='4' width='80' height='55' rx='8' fill='%23BBBEC3'></rect><svg x='10' y='0' width='300' height='200' viewBox='0 0 140 88' fill='none' xmlns='http://www.w3.org/2000/svg'> <polygon points='11,6 21,12 11,18' fill='%237b8794' opacity='0.7'/></svg><rect x='90' y='5' width='45' height='30' rx='8' fill='%23BBBEC3'></rect><svg x='102' y='10' width='20' height='20' viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'><circle cx='100' cy='100' r='100' fill='%237b8794' /><path d='M100,100 L100,0 A100,100 0 0,1 180,60 Z' fill='%237b8794' stroke='%23BBBFC3' stroke-width='5'/><path d='M100,100 L180,60 A100,100 0 0,1 160,170 Z' fill='%237b8794' stroke='%23BBBFC3' stroke-width='5'/></svg></svg>";
 export const mlayout1_selected =
@@ -94,9 +55,10 @@ export const mlayout10_selected =
 
 export const images = [
   {
-    layout: "ac",
-    imageUrl: adaptive,
-    selectedImageUrl: adaptive_selected,
+    layout: "5:7",
+    imageUrl:
+      "../images/presenterLayouts/layoutPresenter_Adaptive-Disabled.svg",
+    selectedImageUrl: "../images/presenterLayouts/layoutPresenter_Adaptive.svg",
     Descrption: "adaptive",
     scope: "Adaptive",
     participantsNumber: 12,
@@ -105,8 +67,9 @@ export const images = [
   },
   {
     layout: "1:0",
-    imageUrl: sf1,
-    selectedImageUrl: sf1_selected,
+    imageUrl: "/src/images/presenterLayouts/layoutPresenter_Individual.svg",
+    selectedImageUrl:
+      "/src/images/presenterLayouts/layoutPresenter_Individual.svg",
     Descrption: "main speaker only",
     scope: "Speaker",
     participantsNumber: 1,
@@ -115,8 +78,8 @@ export const images = [
   },
   {
     layout: "1:1",
-    imageUrl: sf2,
-    selectedImageUrl: sf2_selected,
+    imageUrl: "/src/images/presenterLayouts/layoutPresenter_PIP.svg",
+    selectedImageUrl: "/src/images/presenterLayouts/layoutPresenter_PIP.svg",
     Descrption: "main speaker and up to 1 previous speakers",
     scope: "Speaker",
     participantsNumber: 2,
@@ -125,8 +88,9 @@ export const images = [
   },
   {
     layout: "1:7",
-    imageUrl: sf3,
-    selectedImageUrl: sf3_selected,
+    imageUrl: "/src/images/presenterLayouts/layoutPresenter_Filmstrip8.svg",
+    selectedImageUrl:
+      "/src/images/presenterLayouts/layoutPresenter_Filmstrip8.svg",
     Descrption: "main speaker and up to 7 previous speakers",
     scope: "Speaker",
     participantsNumber: 8,
@@ -135,8 +99,8 @@ export const images = [
   },
   {
     layout: "Duo",
-    imageUrl: es1,
-    selectedImageUrl: es1_selected,
+    imageUrl: "/src/images/presenterLayouts/layoutPresenter_Duo.svg",
+    selectedImageUrl: "/src/images/presenterLayouts/layoutPresenter_Duo.svg",
     Descrption: "2 main speakers only",
     scope: "Equalsize",
     participantsNumber: 2,
@@ -145,8 +109,8 @@ export const images = [
   },
   {
     layout: "Grid3",
-    imageUrl: es2,
-    selectedImageUrl: es2_selected,
+    imageUrl: "/src/images/presenterLayouts/layoutPresenter_Grid3.svg",
+    selectedImageUrl: "/src/images/presenterLayouts/layoutPresenter_Grid3.svg",
     Descrption: "3 main speakers only",
     scope: "Equalsize",
     participantsNumber: 3,
@@ -154,9 +118,9 @@ export const images = [
     total: 3,
   },
   {
-    layout: "2x2",
-    imageUrl: es3,
-    selectedImageUrl: es3_selected,
+    layout: "4:0",
+    imageUrl: "/src/images/presenterLayouts/layoutPresenter_Grid4.svg",
+    selectedImageUrl: "/src/images/presenterLayouts/layoutPresenter_Grid4.svg",
     Descrption: "2x2 layout, up to a maximum of 4 speakers",
     scope: "Equalsize",
     participantsNumber: 4,
@@ -164,9 +128,9 @@ export const images = [
     total: 4,
   },
   {
-    layout: "3x3",
-    imageUrl: es4,
-    selectedImageUrl: es4_selected,
+    layout: "9:0",
+    imageUrl: "/src/images/presenterLayouts/layoutPresenter_Grid9.svg",
+    selectedImageUrl: "/src/images/presenterLayouts/layoutPresenter_Grid9.svg",
     Descrption: "3x3 layout, up to a maximum of 9 speakers",
     scope: "Equalsize",
     participantsNumber: 9,
@@ -174,9 +138,9 @@ export const images = [
     total: 9,
   },
   {
-    layout: "4x4",
-    imageUrl: es5,
-    selectedImageUrl: es5_selected,
+    layout: "16:0",
+    imageUrl: "/src/images/presenterLayouts/layoutPresenter_Grid16.svg",
+    selectedImageUrl: "/src/images/presenterLayouts/layoutPresenter_Grid16.svg",
     Descrption: "4x4 layout, up to a maximum of 16 speakers",
     scope: "Equalsize",
     participantsNumber: 16,
@@ -184,9 +148,9 @@ export const images = [
     total: 16,
   },
   {
-    layout: "5x5",
-    imageUrl: es6,
-    selectedImageUrl: es6_selected,
+    layout: "25:0",
+    imageUrl: "/src/images/presenterLayouts/layoutPresenter_Grid20.svg",
+    selectedImageUrl: "/src/images/presenterLayouts/layoutPresenter_Grid20.svg",
     Descrption: "5x5 layout, up to a maximum of 25 speakers",
     scope: "Equalsize",
     participantsNumber: 25,
@@ -195,8 +159,9 @@ export const images = [
   },
   {
     layout: "2:21",
-    imageUrl: lg1,
-    selectedImageUrl: lg1_selected,
+    imageUrl: "/src/images/presenterLayouts/layoutPresenter_DuoFilmstrip.svg",
+    selectedImageUrl:
+      "/src/images/presenterLayouts/layoutPresenter_DuoFilmstrip.svg",
     Descrption: "two main speakers and up to 21 other participants",
     scope: "Largegroup",
     participantsNumber: 23,
@@ -205,8 +170,8 @@ export const images = [
   },
   {
     layout: "two_mains_eight_around",
-    imageUrl: lg2,
-    selectedImageUrl: lg2_selected,
+    imageUrl: "/src/images/presenterLayouts/layoutPresenter_Duo+8.svg",
+    selectedImageUrl: "/src/images/presenterLayouts/layoutPresenter_Duo+8.svg",
     Descrption: "two main speakers and up to 8 other participants",
     scope: "Largegroup",
     participantsNumber: 10,
@@ -215,8 +180,9 @@ export const images = [
   },
   {
     layout: "one_main_nine_around",
-    imageUrl: lg3,
-    selectedImageUrl: lg3_selected,
+    imageUrl: "/src/images/presenterLayouts/layoutPresenter_Speaker+9.svg",
+    selectedImageUrl:
+      "/src/images/presenterLayouts/layoutPresenter_Speaker+9.svg",
     Descrption: "one main speaker and up to 9 other participants",
     scope: "Largegroup",
     participantsNumber: 10,
@@ -225,8 +191,9 @@ export const images = [
   },
   {
     layout: "1:21",
-    imageUrl: lg4,
-    selectedImageUrl: lg4_selected,
+    imageUrl: "/src/images/presenterLayouts/layoutPresenter_Filmstrip20.svg",
+    selectedImageUrl:
+      "/src/images/presenterLayouts/layoutPresenter_Filmstrip20.svg",
     Descrption: "one main speakers and up to 21 other participants",
     scope: "Largegroup",
     participantsNumber: 22,
@@ -235,8 +202,9 @@ export const images = [
   },
   {
     layout: "one_main_twelve_around",
-    imageUrl: lg5,
-    selectedImageUrl: lg5_selected,
+    imageUrl: "/src/images/presenterLayouts/layoutPresenter_Speaker+12.svg",
+    selectedImageUrl:
+      "/src/images/presenterLayouts/layoutPresenter_Speaker+12.svg",
     Descrption: "One main speaker and up to 12 other participants",
     scope: "Largegroup",
     participantsNumber: 13,
@@ -245,8 +213,9 @@ export const images = [
   },
   {
     layout: "1:33",
-    imageUrl: lg6,
-    selectedImageUrl: lg6_selected,
+    imageUrl: "/src/images/presenterLayouts/layoutPresenter_Speaker+19.svg",
+    selectedImageUrl:
+      "/src/images/presenterLayouts/layoutPresenter_Speaker+19.svg",
     Descrption: "one main speakers and up to 33 other participants",
     scope: "Largegroup",
     participantsNumber: 34,

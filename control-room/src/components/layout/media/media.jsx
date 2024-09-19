@@ -120,8 +120,8 @@ const Media = ({
                   src={src}
                   className={
                     selectedImage === index
-                      ? "mediaImages selected"
-                      : "mediaImages"
+                      ? "mediaImages selected zoom-image"
+                      : "mediaImages  zoom-image"
                   }
                   alt={getLayoutName(index).replaceAll("_", " ").toLowerCase()}
                   title={getLayoutName(index)

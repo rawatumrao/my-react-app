@@ -6,7 +6,7 @@ export const ENVIRONMENT = {
   dev: "dev",
 };
 
-export const ENV = ENVIRONMENT.dev;
+export const ENV = ENVIRONMENT.prod;
 
 // parent page vars
 const pexipDataJsonVar = parent?.parent?.pexipDataJson;
@@ -93,7 +93,7 @@ export const CONTROL_ROOM_OFF_SCREEN =
 
 export const CONTROL_ROOM_PRESENTER_LAYOUT =
   ENV === ENVIRONMENT.dev
-    ? "3x3"
+    ? "9:0"
     : CONTROL_ROOM_SHOW_REFRESH
     ? pexipDataJsonVar?.controlRoomData?.presenterLayout
     : pexipDataJsonVar?.controlRoomData?.defaults?.presenterLayout;
@@ -154,6 +154,7 @@ export const EVENTS = {
   controlRoomApply: "controlRoomApply",
   controlRoomShowRefresh: "controlRoomShowRefresh",
   controlRoomIsLoaded: "controlRoomIsLoaded",
+  controlRoomLayoutUpdate: "controlRoomLayoutUpdate",
 };
 
 export const API_CALLS = {

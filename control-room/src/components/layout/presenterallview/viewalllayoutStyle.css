@@ -23,3 +23,16 @@
   margin: 10px;
   z-index: 1;
 }
+
+.images .disabledImage,
+.view-all-layout .disabledImage,
+.expand-collapse-container .disabledImage {
+  background-color: var(--disabled-bg);
+  border: var(--disabled-border) 3px solid;
+}
+
+.images .selectedImage,
+.view-all-layout .selectedImage {
+  border: var(--selected-border) 3px solid;
+  background-color: var(--selected-bg);
+}
